@@ -1,3 +1,3 @@
-# Ahsaas Kaushal
-# Darcy Bartolome
-# Harshini Poluri
+Ahsaas Kaushal
+Darcy Bartolome
+Harshini Poluri
