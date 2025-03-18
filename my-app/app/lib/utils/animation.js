@@ -136,4 +136,5 @@ export const initAnimations = () => {
     }
   };
   
-  export default { initAnimations, initSmoothScroll, initFaqAccordion, useAnimations, enableAnimations };
+  const animations = { initAnimations, initSmoothScroll, initFaqAccordion, useAnimations, enableAnimations };
+  export default animations;
