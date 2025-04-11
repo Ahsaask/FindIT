@@ -1,6 +1,6 @@
 export default function Hero() {
     return (
-      <section className="relative py-20 px-6 overflow-hidden">
+      <section id="hero" className="relative py-20 px-6 overflow-hidden">
         {/* Background decoration */}
         <div className="absolute top-20 right-10 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-40 left-20 w-72 h-72 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>

@@ -1,4 +1,12 @@
+'use client'
+ 
+import { useRouter } from 'next/navigation'
+
+
 export default function Navbar() {
+
+    const router = useRouter()
+
     return (
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/70 border-b border-white/20 shadow-sm px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -13,7 +21,7 @@ export default function Navbar() {
             <a href="#faq" className="text-gray-700 hover:text-blue-600 transition-all duration-300 hover:scale-105">FAQ</a>
           </div>
           <div>
-            <button className="px-4 py-2 text-blue-600 border border-blue-400 rounded-full hover:bg-blue-50 transition-all duration-300 hover:shadow-lg hover:border-blue-600">
+            <button type="button" onClick={() => router.push('/Signup')} className="px-4 py-2 text-blue-600 border border-blue-400 rounded-full hover:bg-blue-50 transition-all duration-300 hover:shadow-lg hover:border-blue-600">
               Sign In
             </button>
           </div>
