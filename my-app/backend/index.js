@@ -29,6 +29,27 @@ app.get("/finder_accounts", (req, res) => {
   });
 });
 
+// get specific finder account user
+// check if it still returns null might be helpful
+  // check if null deny access to webpage, else login
+app.get("/finder_accounts", (req, res) => {
+  const q = "SELECT * FROM finder WHERE Password = `Password` AND  Email = `Email` VALUES (?)";
+
+  const values = [
+    req.body.Password, // Password as a varchar
+    req.body.Email, // Email as a varchar
+  ];
+
+  db.query(q, [values],(err, data) => {
+    if (err) {
+      console.log(err);
+      return res.json(err);
+    }
+    return res.json(data);
+  });
+});
+
+
 app.post("/finder_accounts", (req, res) => {
   const q = "INSERT INTO finder(`Password`, `Email`) VALUES (?)";
 
@@ -62,6 +83,27 @@ app.get("/owner_accounts", (req, res) => {
 });
 
 
+app.post("/owner_accounts", (req, res) => {
+  const q = "INSERT INTO owner(`Password`, `Email`) VALUES (?)";
+
+  // Use to test the post command to database
+  // const values = [
+  //   "testingPassword123", // Password as a varchar
+  //   "testingemail@example.com", // Email as a varchar
+  // ];
+
+  const values = [
+    req.body.Password, // Password as a varchar
+    req.body.Email, // Email as a varchar
+  ];
+
+  db.query(q, [values], (err, data) => {
+    if (err) return res.send(err);
+    return res.json(data);
+  });
+});
+
+
 app.get("/admin_accounts", (req, res) => {
   const q = "SELECT * FROM admin;";
   db.query(q, (err, data) => {
@@ -69,6 +111,26 @@ app.get("/admin_accounts", (req, res) => {
       console.log(err);
       return res.json(err);
     }
+    return res.json(data);
+  });
+});
+
+app.post("/admin_accounts", (req, res) => {
+  const q = "INSERT INTO admin(`Password`, `Email`) VALUES (?)";
+
+  // Use to test the post command to database
+  // const values = [
+  //   "testingPassword123", // Password as a varchar
+  //   "testingemail@example.com", // Email as a varchar
+  // ];
+
+  const values = [
+    req.body.Password, // Password as a varchar
+    req.body.Email, // Email as a varchar
+  ];
+
+  db.query(q, [values], (err, data) => {
+    if (err) return res.send(err);
     return res.json(data);
   });
 });

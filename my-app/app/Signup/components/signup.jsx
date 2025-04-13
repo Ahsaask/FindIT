@@ -16,7 +16,7 @@ import { useState } from "react";
 import axios from "axios";
 
 
-export default function signin() {
+export default function signup() {
 
   // For the Sql database
   // useEffect is used to fetch data from the database
@@ -25,6 +25,7 @@ export default function signin() {
   // const [owner_accounts, setOwnerAccounts] = useState([ ]);
   // const [admin_accounts, setAdminAccounts] = useState([]);
 
+  const [userMode, setUser] = useState("");
   
   const [error,setError] = useState(false)
 
@@ -119,19 +120,45 @@ export default function signin() {
     // If all validations pass, put user name email password and other information to the database and navigate to the homepage
 
     // add the user info to the finder account table in the database if the user is a finder
-    const finderAccount = {
+    const infoAccount = {
       Password: formData.password,
       Email: formData.email,
     };
 
-    try {
-      await axios.post("http://localhost:8800/finder_accounts", finderAccount);
-      localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
-      // localStorage.setItem('userType', 'finder'); // Set user type in local storage
-      router.push('/homepage');
-    } catch (err) {
-      console.log(err);
-      setError(true);
+    if (userMode == "finderMode") {
+      try {
+        await axios.post("http://localhost:8800/finder_accounts", infoAccount);
+        localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
+        // localStorage.setItem('userType', 'finder'); // Set user type in local storage
+        router.push('/homepage');
+      } catch (err) {
+        console.log(err);
+        setError(true);
+      }
+    }
+
+    if (userMode == "ownerMode") {
+      try {
+        await axios.post("http://localhost:8800/owner_accounts", infoAccount);
+        localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
+        // localStorage.setItem('userType', 'finder'); // Set user type in local storage
+        router.push('/homepage');
+      } catch (err) {
+        console.log(err);
+        setError(true);
+      }
+    }
+
+    if (userMode == "adminMode") {
+      try {
+        await axios.post("http://localhost:8800/admin_accounts", infoAccount);
+        localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
+        // localStorage.setItem('userType', 'finder'); // Set user type in local storage
+        router.push('/homepage');
+      } catch (err) {
+        console.log(err);
+        setError(true);
+      }
     }
 
   };
@@ -150,142 +177,154 @@ export default function signin() {
     <Image src={logo} alt='Logo' width={48} height={48}/>
     <p className='font-semibold text-4xl my-2'>FindIT</p>
     <p className='text-gray-600'>Sign in to manage lost and found items</p>
-    <form onSubmit={handleSignup} className='box px-8 border bg-white shadow-lg my-10 md:w-6/12 lg:w-5/12 xl:w-4/12 2xl:w-3/12 rounded-lg'>
+    <div className='box px-8 border bg-white shadow-lg my-10 md:w-6/12 lg:w-5/12 xl:w-4/12 2xl:w-3/12 rounded-lg'>
       <div className='mt-12 flex flex-row justify-center gap-8'>
-        <button className='font-semibold text-gray-500 border px-5 py-2 rounded-md'> Admin </button>
-        <button className='font-semibold text-gray-500 border px-5 py-2 rounded-md'> Finder </button>
-        <button className='font-semibold text-gray-500 border px-5 py-2 rounded-md'> Owner </button>
+        <button onClick={() => setUser("adminUser")} className={`font-semibold border px-5 py-2 rounded-md 
+          ${ userMode === "adminUser"
+            ? "text-gray-50 bg-blue-500"
+            : "text-gray-500"
+          }`}> Admin </button>
+        <button onClick={() => setUser("finderUser")} className={`font-semibold border px-5 py-2 rounded-md 
+          ${ userMode === "finderUser"
+            ? "text-gray-50 bg-blue-500"
+            : "text-gray-500"
+          }`}> Finder </button>
+        <button onClick={() => setUser("ownerUser")} className={`font-semibold border px-5 py-2 rounded-md 
+          ${ userMode === "ownerUser"
+            ? "text-gray-50 bg-blue-500"
+            : "text-gray-500"
+          }`}> Owner </button>
       </div>
+      <form onSubmit={handleSignup}>
 
-      <div className='pt-10'>
-        <p className='font-semibold text-gray-600'>Email</p>
-        <InputField
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        {submitted && !emailValid && (
-          <div className="mt-2 text-sm text-red-500">
-          {formData.email === ""
-            ? "Email is required."
-            : "Please enter a valid @ucalgary.ca email address."}
-          </div>
-        )}
-      </div>
-
-      <div className='pt-8'>
-        <p className='font-semibold text-gray-600'>Password</p>
-        <InputField
-          type={showPassword ? "text" : "password"}
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          togglePassword={togglePassword}
-          required
-        />
-        {submitted &&
-          (!passwordCriteria.length ||
-          !passwordCriteria.uppercase ||
-          !passwordCriteria.lowercase ||
-          !passwordCriteria.number ||
-          !passwordCriteria.specialChar) && (
-          <div className="mt-2 text-sm dark:text-uConnectDark-textSub">
-            Password must be:
-          </div>
+        <div className='pt-10'>
+          <p className='font-semibold text-gray-600'>Email</p>
+          <InputField
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          {submitted && !emailValid && (
+            <div className="mt-2 text-sm text-red-500">
+            {formData.email === ""
+              ? "Email is required."
+              : "Please enter a valid @ucalgary.ca email address."}
+            </div>
           )}
-
-        {submitted &&
-          (!passwordCriteria.length ||
-          !passwordCriteria.uppercase ||
-          !passwordCriteria.lowercase ||
-          !passwordCriteria.number ||
-          !passwordCriteria.specialChar) && (
-          <div className=" text-sm">
-            <div
-            className={
-              passwordCriteria.length ? "text-green-500" : "text-red-500"
-            }
-            >
-            At least 8 characters long
-            </div>
-            <div
-            className={
-              passwordCriteria.uppercase
-              ? "text-green-500"
-              : "text-red-500"
-            }
-            >
-            Include at least one uppercase letter
-            </div>
-            <div
-            className={
-              passwordCriteria.lowercase
-              ? "text-green-500"
-              : "text-red-500"
-            }
-            >
-            Include at least one lowercase letter
-            </div>
-            <div
-            className={
-              passwordCriteria.number ? "text-green-500" : "text-red-500"
-            }
-            >
-            Include at least one number
-            </div>
-            <div
-            className={
-              passwordCriteria.specialChar
-              ? "text-green-500"
-              : "text-red-500"
-            }
-            >
-            Include at least one special character (@$!%*?&)
-            </div>
-          </div>
-          )}
-      </div>
-
-      <div className='pt-8'>
-        <p className='font-semibold text-gray-600'>Confirm Password</p>
-        <InputField
-          type={showPassword ? "text" : "password"}
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          togglePassword={togglePassword}
-          required
-        />
-
-        {/* Password Match Message */}
-        {(formData.confirmPassword || submitted) && (
-          <div className="mt-2 text-sm">
-            {passwordsMatch ? (
-              <span className="text-green-500">Passwords match!</span>
-            ) : (
-              <span className="text-red-500">Passwords do not match.</span>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className='my-4 flex flex-row place-content-between'>
-        <div className='flex flex-row gap-2 items-center text-gray-500'>
-          <button className='text-2xl'><IoIosCheckboxOutline/></button>
-          <p>Remember me</p>
         </div>
-        <button className='text-blue-500'>Forgot password?</button>
-      </div>
 
-      <button className='py-3 bg-blue-500 text-white text-lg rounded-xl border w-full'>Sign In</button>
+        <div className='pt-8'>
+          <p className='font-semibold text-gray-600'>Password</p>
+          <InputField
+            type={showPassword ? "text" : "password"}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            togglePassword={togglePassword}
+            required
+          />
+          {submitted &&
+            (!passwordCriteria.length ||
+            !passwordCriteria.uppercase ||
+            !passwordCriteria.lowercase ||
+            !passwordCriteria.number ||
+            !passwordCriteria.specialChar) && (
+            <div className="mt-2 text-sm dark:text-uConnectDark-textSub">
+              Password must be:
+            </div>
+            )}
 
-      <div className='my-6 flex flex-row items-center place-content-center gap-1'>
+          {submitted &&
+            (!passwordCriteria.length ||
+            !passwordCriteria.uppercase ||
+            !passwordCriteria.lowercase ||
+            !passwordCriteria.number ||
+            !passwordCriteria.specialChar) && (
+            <div className=" text-sm">
+              <div
+              className={
+                passwordCriteria.length ? "text-green-500" : "text-red-500"
+              }
+              >
+              At least 8 characters long
+              </div>
+              <div
+              className={
+                passwordCriteria.uppercase
+                ? "text-green-500"
+                : "text-red-500"
+              }
+              >
+              Include at least one uppercase letter
+              </div>
+              <div
+              className={
+                passwordCriteria.lowercase
+                ? "text-green-500"
+                : "text-red-500"
+              }
+              >
+              Include at least one lowercase letter
+              </div>
+              <div
+              className={
+                passwordCriteria.number ? "text-green-500" : "text-red-500"
+              }
+              >
+              Include at least one number
+              </div>
+              <div
+              className={
+                passwordCriteria.specialChar
+                ? "text-green-500"
+                : "text-red-500"
+              }
+              >
+              Include at least one special character (@$!%*?&)
+              </div>
+            </div>
+            )}
+        </div>
+
+        <div className='pt-8'>
+          <p className='font-semibold text-gray-600'>Confirm Password</p>
+          <InputField
+            type={showPassword ? "text" : "password"}
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            togglePassword={togglePassword}
+            required
+          />
+
+          {/* Password Match Message */}
+          {(formData.confirmPassword || submitted) && (
+            <div className="mt-2 text-sm">
+              {passwordsMatch ? (
+                <span className="text-green-500">Passwords match!</span>
+              ) : (
+                <span className="text-red-500">Passwords do not match.</span>
+              )}
+            </div>
+          )}
+        </div>
+
+
+        <button className='py-3 mt-4 bg-blue-500 text-white text-lg rounded-xl border w-full'>Sign In</button>
+      </form>
+      {error && (
+        <div className="mt-2 text-sm text-red-500">
+          Error signing up. Please try again.
+        </div>
+      )}
+    <div className='my-3 flex flex-row items-center place-content-center gap-1'>
         <p className='text-gray-600'>Don't have an account?</p>
-        <button className='py-3 text-blue-500'>Sign up</button>
-      </div>
-    </form>
+        <button onClick={() => router.push('/Login')} className='py-3 text-blue-500'>Sign up</button>
+    </div>
+
+    </div>
   </div>
   )
 }
