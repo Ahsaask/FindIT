@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 import { IoIosCheckboxOutline } from "react-icons/io";
 
 // For the Sql database
-import { useEffect } from "react";
+// Removed unused useEffect import
 import { useState } from "react";
 import axios from "axios";
 
@@ -26,10 +26,10 @@ export default function login() {
   // const [admin_accounts, setAdminAccounts] = useState([]);
 
   
-  const [error,setError] = useState(false)
+  // Removed unused error state
 
   // For User LogIn Input
-  const [userMode, setUser] = useState("");
+  const [userMode, setUser] = useState("finderUser");
 
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -47,7 +47,7 @@ export default function login() {
   const togglePassword = () => setShowPassword(!showPassword);
   
 // Handle login
-const handleLogin = (e) => {
+const handleLogin = async (e) => {
   e.preventDefault(); // Prevent form from reloading the page
 
   let isValid = true; // Track if the form is valid
@@ -60,9 +60,9 @@ const handleLogin = (e) => {
   if (!email.trim()) {
     setEmailError("Email is required.");
     isValid = false;
-  } else if (!email.endsWith("@ucalgary.ca")) {
-    setEmailError("Invalid email. Please use your @ucalgary.ca email.");
-    isValid = false;
+  // } else if (!email.endsWith("@ucalgary.ca")) {
+  //   setEmailError("Invalid email. Please use your @ucalgary.ca email.");
+  //   isValid = false;
   }
 
   // Validate password
@@ -71,9 +71,39 @@ const handleLogin = (e) => {
     isValid = false;
   }
 
-  // If validation passes, proceed with login
+  // If validation passes, proceed with login, check if the email and password exist in the database
   if (isValid) {
-    router.push('/homepage');; // Proceed with login
+    const infoAccount = {
+      Password: password,
+      Email: email,
+    };
+
+    try {
+      let endpoint = "";
+      if (userMode === "finderUser") {
+        endpoint = "http://localhost:8800/finder_account";
+      } else if (userMode === "adminUser") {
+        endpoint = "http://localhost:8800/admin_account";
+      } else if (userMode === "ownerUser") {
+        endpoint = "http://localhost:8800/owner_account";
+      }
+
+      if (endpoint) {
+        const response = await axios.post(endpoint, infoAccount);
+        if (response.data && response.data.success) {
+          localStorage.setItem('isLoggedIn', 'true');
+          router.push('/homepage');
+        } else {
+          setEmailError("Invalid credentials.");
+        }
+      } else {
+        setEmailError("Please select a user type.");
+      }
+    } catch (err) {
+      console.log(err);
+      setEmailError("Invalid credentials.");
+      setPasswordError("Invalid credentials.");
+    }
   }
 };
 

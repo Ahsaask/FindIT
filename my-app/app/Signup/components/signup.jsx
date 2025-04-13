@@ -25,7 +25,7 @@ export default function signup() {
   // const [owner_accounts, setOwnerAccounts] = useState([ ]);
   // const [admin_accounts, setAdminAccounts] = useState([]);
 
-  const [userMode, setUser] = useState("");
+  const [userMode, setUser] = useState("finderUser");
   
   const [error,setError] = useState(false)
 
@@ -57,7 +57,7 @@ export default function signup() {
   const specialCharRegex = /[@$!%*?&]/; // At least one special character
   
   // Regular expression for email validation
-  const emailRegex = /@ucalgary\.ca$/;
+  // const emailRegex = /@ucalgary\.ca$/;
   
   // Toggle password visibility
   const togglePassword = () => setShowPassword(!showPassword);
@@ -100,68 +100,85 @@ export default function signup() {
     }
   
     // Validate email ends with "@ucalgary.ca"
-    if (!emailRegex.test(email)) {
-    console.log("email");
-    setEmailValid(false); // Set email valid state to false
-    return;
-    }
+    // if (!emailRegex.test(email)) {
+    // console.log("email");
+    // setEmailValid(false); // Set email valid state to false
+    // return;
+    // }
   
     // Validate password strength
+    if (!userMode) {
+      console.log("Please select a user type");
+      setError(true);
+      return; // Prevent form submission if user type is not selected
+    }
+
     if (!passwordRegex.test(password)) {
-    setPasswordValid(false); // Set password valid state to false
-    console.log("Password");
-    return;
+      setPasswordValid(false); // Set password valid state to false
+      console.log("Password");
+      return;
     }
-  
+    
     if (!passwordsMatch) {
-    console.log("Password match");
-    return; // Prevent form submission if passwords do not match
+      console.log("Password match");
+      return; // Prevent form submission if passwords do not match
     }
+
     // If all validations pass, put user name email password and other information to the database and navigate to the homepage
 
-    // add the user info to the finder account table in the database if the user is a finder
+    // Add the user info to the finder account table in the database if the user is a finder
     const infoAccount = {
       Password: formData.password,
       Email: formData.email,
     };
 
-    if (userMode == "finderMode") {
+    try {
+      // Check if the account already exists
+      const response = await axios.get(`http://localhost:8800/check_account?email=${formData.email}`);
+      if (response.data.exists) {
+      console.log("Account already exists");
+      setError(true);
+      return; // Stop further execution if account exists
+      }
+    } catch (err) {
+      console.log("Error checking account existence:", err);
+      setError(true);
+      return;
+    }
+
+    if (userMode === "finderUser") {
       try {
-        await axios.post("http://localhost:8800/finder_accounts", infoAccount);
-        localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
-        // localStorage.setItem('userType', 'finder'); // Set user type in local storage
-        router.push('/homepage');
+      await axios.post("http://localhost:8800/finder_accounts", infoAccount);
+      localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
+      router.push('/homepage');
       } catch (err) {
-        console.log(err);
-        setError(true);
+      console.log(err);
+      setError(true);
       }
     }
 
-    if (userMode == "ownerMode") {
+    if (userMode === "ownerUser") {
       try {
-        await axios.post("http://localhost:8800/owner_accounts", infoAccount);
-        localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
-        // localStorage.setItem('userType', 'finder'); // Set user type in local storage
-        router.push('/homepage');
+      await axios.post("http://localhost:8800/owner_accounts", infoAccount);
+      localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
+      router.push('/homepage');
       } catch (err) {
-        console.log(err);
-        setError(true);
+      console.log(err);
+      setError(true);
       }
     }
 
-    if (userMode == "adminMode") {
+    if (userMode === "adminUser") {
       try {
-        await axios.post("http://localhost:8800/admin_accounts", infoAccount);
-        localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
-        // localStorage.setItem('userType', 'finder'); // Set user type in local storage
-        router.push('/homepage');
+      await axios.post("http://localhost:8800/admin_accounts", infoAccount);
+      localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
+      router.push('/homepage');
       } catch (err) {
-        console.log(err);
-        setError(true);
+      console.log(err);
+      setError(true);
       }
     }
-
-  };
+  }
   
   // Password validation states for each rule
   const passwordCriteria = {
