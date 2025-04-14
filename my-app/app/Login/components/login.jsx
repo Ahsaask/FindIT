@@ -74,11 +74,11 @@ const handleLogin = async (e) => {
     try {
       let endpoint = "";
       if (userMode === "finderUser") {
-        endpoint = "http://findit-backend.vercel.app/finder_account";
+        endpoint = "http://localhost:8800/finder_account";
       } else if (userMode === "adminUser") {
-        endpoint = "http://findit-backend.vercel.app/admin_account";
+        endpoint = "http://localhost:8800/admin_account";
       } else if (userMode === "ownerUser") {
-        endpoint = "http://findit-backend.vercel.app/owner_account";
+        endpoint = "http://localhost:8800/owner_account";
       }
 
       if (endpoint) {

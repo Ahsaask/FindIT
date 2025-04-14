@@ -30,12 +30,12 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     try {
       // Fetch lost items
-      const itemsRes = await axios.get("http://findit-backend.vercel.app/lost_items");
+      const itemsRes = await axios.get("http://localhost:8800/lost_items");
       setLostItems(itemsRes.data);
       
       // Fetch users
-      const findersRes = await axios.get("http://findit-backend.vercel.app/finder_accounts");
-      const ownersRes = await axios.get("http://findit-backend.vercel.app/owner_accounts");
+      const findersRes = await axios.get("http://localhost:8800/finder_accounts");
+      const ownersRes = await axios.get("http://localhost:8800/owner_accounts");
       
       setUsers({
         finders: findersRes.data,

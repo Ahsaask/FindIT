@@ -32,7 +32,7 @@ export default function ItemsManagement() {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://findit-backend.vercel.app/lost_items");
+      const response = await axios.get("http://localhost:8800/lost_items");
       setItems(response.data);
       setLoading(false);
     } catch (error) {
@@ -54,7 +54,7 @@ export default function ItemsManagement() {
   const handleSaveItem = async (updatedItem) => {
     try {
       // Add your endpoint for updating items
-      await axios.put(`http://findit-backend.vercel.app/update_item/${editItem.LostItem_ID}`, updatedItem);
+      await axios.put(`http://localhost:8800/update_item/${editItem.LostItem_ID}`, updatedItem);
       setIsEditModalOpen(false);
       fetchItems(); // Refresh items list
     } catch (error) {
@@ -65,7 +65,7 @@ export default function ItemsManagement() {
   const handleDeleteConfirm = async () => {
     try {
       // Add your endpoint for deleting items
-      await axios.delete(`http://findit-backend.vercel.app/delete_item/${itemToDelete.LostItem_ID}`);
+      await axios.delete(`http://localhost:8800/delete_item/${itemToDelete.LostItem_ID}`);
       setIsDeleteModalOpen(false);
       fetchItems(); // Refresh items list
     } catch (error) {

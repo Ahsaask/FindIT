@@ -31,7 +31,7 @@ export default function Home() {
     useEffect(() => {
         const fetchAllLostItems = async () => {
             try {
-                const res = await axios.get("http://findit-backend.vercel.app/lost_items");
+                const res = await axios.get("http://localhost:8800/lost_items");
                 if (res.status === 200) {
                     setLostItems(res.data);
                     setNumItems(res.data.length);
@@ -48,7 +48,7 @@ export default function Home() {
     useEffect(() => {
         const fetchAllClaims = async () => {
             try {
-                const res = await axios.get("http://findit-backend.vercel.app/claim_items");
+                const res = await axios.get("http://localhost:8800/claim_items");
                 if (res.status === 200) {
                     setClaims(res.data);
                     setNumClaims(res.data.length);

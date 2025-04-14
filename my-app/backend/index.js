@@ -5,59 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-// app.use(cors());
-
-// app.use(cors({
-//   origin: ['http://localhost:3000', 'https://find-it-git-ahsaas-databasetest-ahsaas-projects.vercel.app', 'https://find-it.vercel.app','*'],
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   credentials: true,
-//   allowedHeaders: ['Content-Type', 'Authorization']
-// }));
-
-// app.options('*', cors());
-
-// app.use(express.json());
-
-const allowedOrigins = [
-  'http://localhost:3000', // For local frontend development
-  'https://find-it-git-ahsaas-databasetest-ahsaas-projects.vercel.app', // Your preview URL
-  'https://find-it-uofc.vercel.app', // Your production URL
-  // Add any other specific origins if necessary
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-      // Allow requests with no origin OR if origin is in the allowed list
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-          callback(null, true);
-      } else {
-          console.error('CORS Error: Origin not allowed:', origin);
-          callback(new Error('Not allowed by CORS'));
-      }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true, // Requires specific origin, '*' is ignored/invalidated by browsers here
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Consider removing or refining app.options('*', cors());
-// The main middleware often handles OPTIONS correctly now.
-// If you keep it, ensure it reflects the same logic as above.
-// For instance:
-app.options('*', (req, res, next) => {
-  const origin = req.header('Origin');
-  if (!origin || allowedOrigins.includes(origin)) {
-      res.header('Access-Control-Allow-Origin', origin); // Reflect allowed origin
-      res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      res.header('Access-Control-Allow-Credentials', 'true');
-      res.sendStatus(204);
-  } else {
-       res.sendStatus(403); // Or handle as per your policy
-  }
-});
-
-
+app.use(cors());
 app.use(express.json());
 
 const db = mysql.createConnection({

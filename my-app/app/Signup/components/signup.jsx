@@ -134,7 +134,7 @@ export default function signup() {
 
     try {
       // Check if the account already exists
-      const response = await axios.get(`http://findit-backend.vercel.app/check_account?email=${formData.email}`);
+      const response = await axios.get(`http://localhost:8800/check_account?email=${formData.email}`);
       if (response.data.exists) {
       console.log("Account already exists");
       setError(true);
@@ -148,7 +148,7 @@ export default function signup() {
 
     if (userMode === "finderUser") {
       try {
-      await axios.post("http://findit-backend.vercel.app/finder_accounts", infoAccount);
+      await axios.post("http://localhost:8800/finder_accounts", infoAccount);
       localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
       router.push('/homepage');
       } catch (err) {
@@ -159,7 +159,7 @@ export default function signup() {
 
     if (userMode === "ownerUser") {
       try {
-      await axios.post("http://findit-backend.vercel.app/owner_accounts", infoAccount);
+      await axios.post("http://localhost:8800/owner_accounts", infoAccount);
       localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
       router.push('/homepage');
       } catch (err) {
@@ -170,7 +170,7 @@ export default function signup() {
 
     if (userMode === "adminUser") {
       try {
-      await axios.post("http://findit-backend.vercel.app/admin_accounts", infoAccount);
+      await axios.post("http://localhost:8800/admin_accounts", infoAccount);
       localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
       router.push('/homepage');
       } catch (err) {
