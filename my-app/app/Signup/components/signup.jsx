@@ -168,16 +168,16 @@ export default function signup() {
       }
     }
 
-    if (userMode === "adminUser") {
-      try {
-      await axios.post("http://localhost:8800/admin_accounts", infoAccount);
-      localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
-      router.push('/homepage');
-      } catch (err) {
-      console.log(err);
-      setError(true);
-      }
-    }
+    // if (userMode === "adminUser") {
+    //   try {
+    //   await axios.post("http://localhost:8800/admin_accounts", infoAccount);
+    //   localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
+    //   router.push('/homepage');
+    //   } catch (err) {
+    //   console.log(err);
+    //   setError(true);
+    //   }
+    // }
   }
   
   // Password validation states for each rule
@@ -196,11 +196,11 @@ export default function signup() {
     <p className='text-gray-600'>Sign in to manage lost and found items</p>
     <div className='box px-8 border bg-white shadow-lg my-10 md:w-6/12 lg:w-5/12 xl:w-4/12 2xl:w-3/12 rounded-lg'>
       <div className='mt-12 flex flex-row justify-center gap-8'>
-        <button onClick={() => setUser("adminUser")} className={`font-semibold border px-5 py-2 rounded-md 
+        {/* <button onClick={() => setUser("adminUser")} className={`font-semibold border px-5 py-2 rounded-md 
           ${ userMode === "adminUser"
             ? "text-gray-50 bg-blue-500"
             : "text-gray-500"
-          }`}> Admin </button>
+          }`}> Admin </button> */}
         <button onClick={() => setUser("finderUser")} className={`font-semibold border px-5 py-2 rounded-md 
           ${ userMode === "finderUser"
             ? "text-gray-50 bg-blue-500"
@@ -337,8 +337,8 @@ export default function signup() {
         </div>
       )}
     <div className='my-3 flex flex-row items-center place-content-center gap-1'>
-        <p className='text-gray-600'>Don't have an account?</p>
-        <button onClick={() => router.push('/Login')} className='py-3 text-blue-500'>Sign up</button>
+        <p className='text-gray-600'>Already have an account?</p>
+        <button onClick={() => router.push('/Login')} className='py-3 text-blue-500'>Sign In</button>
     </div>
 
     </div>

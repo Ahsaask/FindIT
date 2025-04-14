@@ -1,15 +1,65 @@
 import React from 'react'
 import Image from "next/image";
 import { useRouter } from 'next/navigation'
+import { useState } from 'react';
+import { useEffect } from 'react';
+import axios from "axios";
 import './components.css';
 import logo from '../../../assets/FindItLogo.png';
-import profile from '../../../assets/tracySmith.jpeg'
+
+
+import defaultprofile from '../../../assets/default.png'
 
 import { FaRegBell } from "react-icons/fa";
 
 export default function Navbar() {
 
   const router = useRouter()
+
+  const [userid, setUserID] = useState("");
+
+  const [profile, setProfile] = useState({
+    firstname: "",
+    lastname: "",
+    image: null,
+    bio: "",
+    mobile: "",
+  });
+
+  useEffect(() => {
+      const storedID = localStorage.getItem('userId');
+      setUserID(storedID);
+    }, []);
+
+    const handlePostRequest = async () => {
+      try {
+        const res = await axios.post("http://localhost:8800/get_user_profile", {
+          Finder_ID_number: userid,
+          Owner_ID_number: userid,  
+          // Match backend expected key
+        });
+
+        const user = res.data.user;
+        console.log(user)
+    
+        setProfile({
+          firstname: user.First_name,
+          lastname: user.Last_name,
+          image: user.Image ? res.data.user.Image : null,
+          bio: user.Bio,
+          mobile: user.Mobile_no,
+        });
+  
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    useEffect(() => {
+      if (userid) {
+        handlePostRequest();
+      }
+    }, [userid]); // run this effect *only when* userid is updated
 
   return (
     <nav className="px-10 py-2 shadow-sm">
@@ -20,7 +70,7 @@ export default function Navbar() {
         <div className='inline-flex items-center gap-3'>
             <FaRegBell className='cursor-pointer'/>
             {/* Template Profile Pick */}
-            <Image src={profile} alt='Profile Picture' className=" w-10 h-10 rounded-full object-cover cursor-pointer" onClick={() => router.push('/profile')}/>
+            <Image src={profile.image || defaultprofile} alt='Profile Picture' className=" w-10 h-10 rounded-full object-cover cursor-pointer" onClick={() => router.push('/profile')}/>
         </div>
     </nav>
 

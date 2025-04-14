@@ -1,6 +1,7 @@
 import express from "express";
 import mysql from "mysql2";
 import cors from "cors";
+import { use } from "react";
 
 const app = express();
 app.use(cors());
@@ -243,6 +244,36 @@ app.get("/claim_items", (req, res) => {
       return res.status(500).json({ error: "Internal server error." });
     }
     return res.json(data);
+  });
+});
+
+app.post("/get_user_profile", (req, res) => {
+  const q = `SELECT profile.Mobile_no, Bio, Image, First_name, Last_name
+            FROM finditdb.finder
+            JOIN finditdb.finder_name ON finder_name.Finder_ID_number = finder.Finder_ID_number
+            JOIN finditdb.profile ON finder_name.Mobile_no = profile.Mobile_no
+            WHERE finder.Finder_ID_number = ?
+
+            UNION
+
+            SELECT profile.Mobile_no, Bio, Image, First_name, Last_name
+            FROM finditdb.owner
+            JOIN finditdb.owner_name ON owner_name.Owner_ID_number = owner.Owner_ID_number
+            JOIN finditdb.profile ON owner.Mobile_no = profile.Mobile_no
+            WHERE owner.Owner_ID_number = ?`;
+
+  const values = [
+    req.body.Finder_ID_number,
+    req.body.Owner_ID_number // Same ID used for both
+  ];
+
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Database error." });
+    }
+
+    return res.json({ success: true, user: data[0] });
   });
 });
 

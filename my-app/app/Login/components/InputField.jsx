@@ -21,7 +21,7 @@ export default function InputField({type, name, value, onChange }) {
           className="mt-2 py-3 px-4 shadow-sm rounded-md border w-full"
         />
         {type === "password" && (
-          <button
+          <button type="button"
             onClick={handleTogglePasswordVisibility} // Toggle visibility
             className="absolute right-4 top-5 text-2xl cursor-pointer"
           >

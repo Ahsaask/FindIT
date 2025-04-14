@@ -84,7 +84,12 @@ const handleLogin = async (e) => {
       if (endpoint) {
         const response = await axios.post(endpoint, infoAccount);
         if (response.data && response.data.success) {
+          const user = response.data.user;
+          console.log(user)
+          // Store user info in localStorage (or cookies, or global state like Redux)
           localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userId', user.Finder_ID_number);
+
           router.push('/homepage');
         } else {
           setEmailError("Invalid credentials.");
@@ -166,18 +171,18 @@ const handleLogin = async (e) => {
         
         <div className='my-4 flex flex-row place-content-between'>
           <div className='flex flex-row gap-2 items-center text-gray-500'>
-            <button className='text-2xl'><IoIosCheckboxOutline/></button>
-            <p>Remember me</p>
+            {/* <button type='button' className='text-2xl'><IoIosCheckboxOutline/></button>
+            <p>Remember me</p> */}
           </div>
-          <button className='text-blue-500'>Forgot password?</button>
+          <button type='button' className='text-blue-500'>Forgot password?</button>
         </div>
 
-        <button className='py-3 bg-blue-500 text-white text-lg rounded-xl border w-full'>Sign In</button>
+        <button type='submit' className='py-3 bg-blue-500 text-white text-lg rounded-xl border w-full'>Sign In</button>
 
       </form>
       <div className='my-6 flex flex-row items-center place-content-center gap-1'>
-        <p className='text-gray-600'>Already have an account?</p>
-        <button onClick={() => router.push('/Signup')} className='py-3 text-blue-500'>Sign In</button>
+        <p className='text-gray-600'>Don't have an account?</p>
+        <button onClick={() => router.push('/Signup')} className='py-3 text-blue-500'>Sign up</button>
       </div>
     </div>
   </div>
