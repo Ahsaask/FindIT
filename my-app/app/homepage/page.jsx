@@ -125,8 +125,8 @@ export default function Home() {
                         </tr>
                     </thead>
                     <tbody>
-                        {lostitems.map((item) => (
-                            <tr className="text-left" key={item.id}>
+                        {lostitems.map((item, index) => (
+                            <tr className="text-left" key={item.id || index}>
                                 <td className="px-4 py-4 flex items-center gap-4">
                                     <FaLaptop className='text-xl'/>
                                     <div>

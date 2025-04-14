@@ -21,13 +21,6 @@ export default function login() {
   // For the Sql database
   // useEffect is used to fetch data from the database
 
-  // const [finder_accounts, setFinderAccounts] = useState([]);
-  // const [owner_accounts, setOwnerAccounts] = useState([ ]);
-  // const [admin_accounts, setAdminAccounts] = useState([]);
-
-  
-  // Removed unused error state
-
   // For User LogIn Input
   const [userMode, setUser] = useState("finderUser");
 
