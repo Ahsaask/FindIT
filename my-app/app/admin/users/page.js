@@ -33,8 +33,8 @@ export default function UsersManagement() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const findersRes = await axios.get("http://localhost:8800/finder_accounts");
-      const ownersRes = await axios.get("http://localhost:8800/owner_accounts");
+      const findersRes = await axios.get("http://findit-backend.vercel.app/finder_accounts");
+      const ownersRes = await axios.get("http://findit-backend.vercel.app/owner_accounts");
       
       setUsers({
         finders: findersRes.data,
@@ -63,10 +63,10 @@ export default function UsersManagement() {
     try {
       if (userTypeToDelete === 'Finder') {
         // Add your endpoint for deleting finder users
-        await axios.delete(`http://localhost:8800/delete_finder/${userToDelete}`);
+        await axios.delete(`http://findit-backend.vercel.app/delete_finder/${userToDelete}`);
       } else if (userTypeToDelete === 'Owner') {
         // Add your endpoint for deleting owner users
-        await axios.delete(`http://localhost:8800/delete_owner/${userToDelete}`);
+        await axios.delete(`http://findit-backend.vercel.app/delete_owner/${userToDelete}`);
       }
       setIsDeleteModalOpen(false);
       fetchUsers(); // Refresh users list
