@@ -83,9 +83,24 @@ const handleLogin = async (e) => {
 
       if (endpoint) {
         const response = await axios.post(endpoint, infoAccount);
+        // if (response.data && response.data.success) {
+        //   localStorage.setItem('isLoggedIn', 'true');
+        //   localStorage.setItem('userRole', userMode);
+        //   router.push('/homepage');
+        // } else {
+        //   setEmailError("Invalid credentials.");
+        // }
+        // Inside your handleLogin function, when login is successful:
         if (response.data && response.data.success) {
           localStorage.setItem('isLoggedIn', 'true');
-          router.push('/homepage');
+          localStorage.setItem('userRole', userMode); // ADD THIS LINE
+          
+          // Redirect based on user type
+          if (userMode === "adminUser") {
+            router.push('/admin'); // Redirect admins to admin panel
+          } else {
+            router.push('/homepage'); // Regular users go to homepage
+          }
         } else {
           setEmailError("Invalid credentials.");
         }

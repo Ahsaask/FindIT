@@ -1,16 +1,26 @@
 import express from "express";
 import mysql from "mysql2";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// const db = mysql.createConnection({
+//   host: "localhost",
+//   user: "root",
+//   password: "#@32!Admin99",
+//   database: "finditdb",
+// });
+
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "Blade4844912",
-  database: "finditdb",
+  host: process.env.DB_HOST || "localhost",
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "#@32!Admin99",
+  database: process.env.DB_NAME || "finditdb"
 });
 
 app.get("/", (req, res) => {
@@ -167,8 +177,8 @@ app.get("/admin_accounts", (req, res) => {
 });
 
 app.post("/admin_account", (req, res) => {
-  const q = "SELECT * FROM owner WHERE Password = ? AND Email = ?";
-
+  // const q = "SELECT * FROM owner WHERE Password = ? AND Email = ?";
+  const q = "SELECT * FROM admin WHERE Password = ? AND Email = ?";
   // test with existing account
   // const values = [
   //   "admin123", // Password as a varchar
@@ -220,8 +230,22 @@ app.post("/admin_accounts", (req, res) => {
   });
 });
 
+// app.get("/lost_items", (req, res) => {
+//   const q = `SELECT Description, Name, Status, Date, Floor_number, Location_Name, Address 
+//              FROM finditdb.lost_item 
+//              JOIN finditdb.location ON lost_item.Location_id = location.Location_id`;
+
+//   db.query(q, (err, data) => {
+//     if (err) {
+//       console.error("Database query error:", err);
+//       return res.status(500).json({ error: "Internal server error." });
+//     }
+//     return res.json(data);
+//   });
+// });
+
 app.get("/lost_items", (req, res) => {
-  const q = `SELECT Description, Name, Status, Date, Floor_number, Location_Name, Address 
+  const q = `SELECT lost_item.LostItem_ID, Description, Name, Status, Date, Floor_number, Location_Name, Address 
              FROM finditdb.lost_item 
              JOIN finditdb.location ON lost_item.Location_id = location.Location_id`;
 
@@ -243,6 +267,67 @@ app.get("/claim_items", (req, res) => {
       return res.status(500).json({ error: "Internal server error." });
     }
     return res.json(data);
+  });
+});
+
+// Update an item (for admin)
+app.put("/update_item/:id", (req, res) => {
+  const itemId = req.params.id;
+  const { Name, Description, Status } = req.body;
+  
+  const q = "UPDATE lost_item SET Name = ?, Description = ?, Status = ? WHERE LostItem_ID = ?";
+  
+  db.query(q, [Name, Description, Status, itemId], (err, data) => {
+    if (err) {
+      console.error("Error updating item:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Item updated successfully" });
+  });
+});
+
+// Delete an item (for admin)
+app.delete("/delete_item/:id", (req, res) => {
+  const itemId = req.params.id;
+  
+  const q = "DELETE FROM lost_item WHERE LostItem_ID = ?";
+  
+  db.query(q, [itemId], (err, data) => {
+    if (err) {
+      console.error("Error deleting item:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Item deleted successfully" });
+  });
+});
+
+// Delete a finder (for admin)
+app.delete("/delete_finder/:id", (req, res) => {
+  const finderId = req.params.id;
+  
+  const q = "DELETE FROM finder WHERE Finder_ID_number = ?";
+  
+  db.query(q, [finderId], (err, data) => {
+    if (err) {
+      console.error("Error deleting finder:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Finder deleted successfully" });
+  });
+});
+
+// Delete an owner (for admin)
+app.delete("/delete_owner/:id", (req, res) => {
+  const ownerId = req.params.id;
+  
+  const q = "DELETE FROM owner WHERE Owner_ID_number = ?";
+  
+  db.query(q, [ownerId], (err, data) => {
+    if (err) {
+      console.error("Error deleting owner:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Owner deleted successfully" });
   });
 });
 
