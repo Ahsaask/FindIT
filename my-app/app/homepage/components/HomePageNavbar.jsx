@@ -17,6 +17,7 @@ export default function Navbar() {
   const router = useRouter()
 
   const [userid, setUserID] = useState("");
+  const [openProfilePic, setOpenProfilePic] = useState(false)
 
   const [profile, setProfile] = useState({
     firstname: "",
@@ -70,7 +71,18 @@ export default function Navbar() {
         <div className='inline-flex items-center gap-3'>
             <FaRegBell className='cursor-pointer'/>
             {/* Template Profile Pick */}
-            <Image src={profile.image || defaultprofile} alt='Profile Picture' className=" w-10 h-10 rounded-full object-cover cursor-pointer" onClick={() => router.push('/profile')}/>
+            <Image src={profile.image || defaultprofile} alt='Profile Picture' className=" w-10 h-10 rounded-full object-cover cursor-pointer" onClick={() => setOpenProfilePic(!openProfilePic)}/>
+            {openProfilePic && (
+              <div className="absolute top-14 right-8 bg-white shadow-lg rounded-lg p-3 w-40 z-50">
+                <p className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded" onClick={() => router.push('/profile')}>My Profile</p>
+                <p className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded" onClick={() => router.push('/messages')}>Messages</p>
+                <p className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded" onClick={() => {
+                  localStorage.removeItem('userId');
+                  localStorage.setItem('isLoggedIn', 'false');
+                  router.push('/Login');
+                }}>Log Out</p>
+              </div>
+            )}
         </div>
     </nav>
 

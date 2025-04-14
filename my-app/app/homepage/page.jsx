@@ -67,7 +67,7 @@ export default function Home() {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
     
         if (!loggedIn) {
-          router.push('/login'); // Redirect to login if not logged in
+          router.push('/Login'); // Redirect to login if not logged in
         };
     }, [router]);
 
