@@ -184,9 +184,9 @@ export default function Home() {
                                 <p className='font-semibold text-sm'>Messages</p>
                             </button>
 
-                            <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3'>
+                            <button onClick={() => router.push('/view-posts')} className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3'>
                                 <IoMdSettings className='text-blue-500 text-3xl'/>
-                                <p className='font-semibold text-sm'>Settings</p>
+                                <p className='font-semibold text-sm'>View Posts</p>
                             </button>
                         </div>
                     </div>

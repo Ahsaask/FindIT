@@ -301,6 +301,21 @@ app.post("/get_user_profile", (req, res) => {
   });
 });
 
+app.get("/posts", (req, res) => {
+  const q = `SELECT post.Title, Content, Year, Day, Month, Image 
+            FROM finditdb.post
+            JOIN finditdb.post_date ON post.Title=post_date.Title
+            JOIN finditdb.post_image ON post_date.Title=post_image.Title`;
+
+  db.query(q, (err, data) => {
+    if (err) {
+      console.error("Database query error:", err);
+      return res.status(500).json({ error: "Internal server error." });
+    }
+    return res.json(data);
+  });
+});
+
 app.listen(8800, () => {
     console.log("Connected to backend for FindIt.");
 });

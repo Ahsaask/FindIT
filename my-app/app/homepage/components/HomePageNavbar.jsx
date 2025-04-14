@@ -73,7 +73,7 @@ export default function Navbar() {
             {/* Template Profile Pick */}
             <Image src={profile.image || defaultprofile} alt='Profile Picture' className=" w-10 h-10 rounded-full object-cover cursor-pointer" onClick={() => setOpenProfilePic(!openProfilePic)}/>
             {openProfilePic && (
-              <div className="absolute top-14 right-8 bg-white shadow-lg rounded-lg p-3 w-40 z-50">
+              <div className="absolute top-14 right-8 bg-white shadow-lg rounded-lg p-3 w-40 z-50 text-lg">
                 <p className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded" onClick={() => router.push('/profile')}>My Profile</p>
                 <p className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded" onClick={() => router.push('/messages')}>Messages</p>
                 <p className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded" onClick={() => {
