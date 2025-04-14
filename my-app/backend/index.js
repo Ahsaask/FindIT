@@ -5,15 +5,18 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+// app.use(cors());
 
-// const db = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "#@32!Admin99",
-//   database: "finditdb",
-// });
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://your-frontend-domain.vercel.app', '*'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.options('*', cors());
+
+app.use(express.json());
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
