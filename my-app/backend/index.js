@@ -10,7 +10,8 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "Blade4844912",
+  // password: "Blade4844912", 
+  password: "#@32!Admin99" ,
   database: "finditdb",
 });
 
@@ -313,6 +314,170 @@ app.get("/posts", (req, res) => {
       return res.status(500).json({ error: "Internal server error." });
     }
     return res.json(data);
+  });
+});
+
+app.post("/create_profile", (req, res) => {
+
+  const includeImage = req.body.Image !== null;
+  
+  let q;
+  let values;
+  
+  if (includeImage) {
+    q = "INSERT INTO profile(`Mobile_no`, `Bio`, `Image`) VALUES (?, ?, ?)";
+    values = [
+      req.body.Mobile_no,
+      req.body.Bio || null,
+      req.body.Image  
+    ];
+  } else {
+    q = "INSERT INTO profile(`Mobile_no`, `Bio`) VALUES (?, ?)";
+    values = [
+      req.body.Mobile_no,
+      req.body.Bio || null
+    ];
+  }
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to create profile" });
+    }
+    return res.json({ success: true, data });
+  });
+});
+
+
+app.post("/create_finder_name", (req, res) => {
+  const q = "INSERT INTO finder_name(`Finder_ID_number`, `First_name`, `Last_name`, `Mobile_no`) VALUES (?, ?, ?, ?)";
+  
+  const values = [
+    req.body.Finder_ID_number,
+    req.body.First_name,
+    req.body.Last_name,
+    req.body.Mobile_no
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to create finder name" });
+    }
+    return res.json({ success: true, data });
+  });
+});
+
+app.post("/create_owner_name", (req, res) => {
+  const q = "INSERT INTO owner_name(`Owner_ID_number`, `First_name`, `Last_name`) VALUES (?, ?, ?)";
+  
+  const values = [
+    req.body.Owner_ID_number,
+    req.body.First_name,
+    req.body.Last_name
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to create owner name" });
+    }
+    return res.json({ success: true, data });
+  });
+});
+
+
+app.put("/update_owner_mobile", (req, res) => {
+  const q = "UPDATE owner SET Mobile_no = ? WHERE Owner_ID_number = ?";
+  
+  const values = [
+    req.body.Mobile_no,
+    req.body.Owner_ID_number
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to update owner mobile" });
+    }
+    return res.json({ success: true, data });
+  });
+});
+
+
+app.put("/update_profile", (req, res) => {
+
+  let q;
+  let values;
+  
+  if (req.body.Image !== null) {
+    q = "UPDATE profile SET Bio = ?, Image = ? WHERE Mobile_no = ?";
+    values = [
+      req.body.Bio || null,
+      req.body.Image,
+      req.body.Mobile_no
+    ];
+  } else {
+    q = "UPDATE profile SET Bio = ? WHERE Mobile_no = ?";
+    values = [
+      req.body.Bio || null,
+      req.body.Mobile_no
+    ];
+  }
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to update profile" });
+    }
+    return res.json({ success: true, data });
+  });
+});
+
+app.put("/update_finder_name", (req, res) => {
+  const q = "UPDATE finder_name SET First_name = ?, Last_name = ?, Mobile_no = ? WHERE Finder_ID_number = ?";
+  
+  const values = [
+    req.body.First_name,
+    req.body.Last_name,
+    req.body.Mobile_no,
+    req.body.Finder_ID_number
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to update finder name" });
+    }
+
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "Finder name record not found" });
+    }
+    
+    return res.json({ success: true, data });
+  });
+});
+
+app.put("/update_owner_name", (req, res) => {
+  const q = "UPDATE owner_name SET First_name = ?, Last_name = ? WHERE Owner_ID_number = ?";
+  
+  const values = [
+    req.body.First_name,
+    req.body.Last_name,
+    req.body.Owner_ID_number
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to update owner name" });
+    }
+    
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "Owner name record not found" });
+    }
+    
+    return res.json({ success: true, data });
   });
 });
 

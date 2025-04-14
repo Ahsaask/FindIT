@@ -154,6 +154,7 @@ export default function signup() {
         localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
         // Store user info in localStorage (or cookies, or global state like Redux)
         localStorage.setItem('userId', userid);
+        localStorage.setItem('userType', 'finderUser'); 
         router.push('/create-profile');
       } catch (err) {
         console.log(err);
@@ -169,6 +170,7 @@ export default function signup() {
         localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
         // Store user info in localStorage (or cookies, or global state like Redux)
         localStorage.setItem('userId', userid);
+        localStorage.setItem('userType', 'ownerUser');
         router.push('/create-profile');
       } catch (err) {
         console.log(err);
