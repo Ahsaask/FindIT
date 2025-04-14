@@ -21,8 +21,26 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
         {children}
+        {/* Script to handle browser extension attributes */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Remove browser extension attributes that cause hydration errors
+              document.addEventListener('DOMContentLoaded', function() {
+                const body = document.body;
+                if (body.hasAttribute('data-new-gr-c-s-check-loaded')) {
+                  body.removeAttribute('data-new-gr-c-s-check-loaded');
+                }
+                if (body.hasAttribute('data-gr-ext-installed')) {
+                  body.removeAttribute('data-gr-ext-installed');
+                }
+              });
+            `,
+          }}
+        />
       </body>
     </html>
   );
