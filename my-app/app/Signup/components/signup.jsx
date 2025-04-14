@@ -134,7 +134,7 @@ export default function signup() {
 
     try {
       // Check if the account already exists
-      const response = await axios.get(`http://localhost:8800/check_account?email=${formData.email}`);
+      const response = await axios.post(`http://localhost:8800/check_account?email=${encodeURIComponent(formData.email)}`);
       if (response.data.exists) {
       console.log("Account already exists");
       setError(true);
@@ -148,23 +148,31 @@ export default function signup() {
 
     if (userMode === "finderUser") {
       try {
-      await axios.post("http://localhost:8800/finder_accounts", infoAccount);
-      localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
-      router.push('/homepage');
+        const response = await axios.post("http://localhost:8800/finder_accounts", infoAccount);
+        const userid = response.data.insertId;
+        // console.log(userid)
+        localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
+        // Store user info in localStorage (or cookies, or global state like Redux)
+        localStorage.setItem('userId', userid);
+        router.push('/create-profile');
       } catch (err) {
-      console.log(err);
-      setError(true);
+        console.log(err);
+        setError(true);
       }
     }
 
     if (userMode === "ownerUser") {
       try {
-      await axios.post("http://localhost:8800/owner_accounts", infoAccount);
-      localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
-      router.push('/homepage');
+        const response = await axios.post("http://localhost:8800/owner_accounts", infoAccount);
+        const userid = response.data.insertId;
+        // console.log(userid)
+        localStorage.setItem('isLoggedIn', 'true'); // Set login status in local storage
+        // Store user info in localStorage (or cookies, or global state like Redux)
+        localStorage.setItem('userId', userid);
+        router.push('/create-profile');
       } catch (err) {
-      console.log(err);
-      setError(true);
+        console.log(err);
+        setError(true);
       }
     }
 

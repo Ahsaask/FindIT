@@ -155,6 +155,30 @@ app.post("/owner_accounts", (req, res) => {
   });
 });
 
+app.post("/check_account", (req, res) => {
+  const email = req.query.email;
+  const q = `SELECT Email FROM finder WHERE Email = ?
+             UNION
+             SELECT Email FROM owner WHERE Email = ?
+             UNION
+             SELECT Email FROM admin WHERE Email = ?`;
+
+  const values = [email, email, email];
+
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Database error." });
+    }
+
+    if (data.length > 0) {
+      return res.json({ exists: true });
+    }
+
+    return res.json({ exists: false });
+  });
+});
+
 
 app.get("/admin_accounts", (req, res) => {
   const q = "SELECT * FROM admin;";
