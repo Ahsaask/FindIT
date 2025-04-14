@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 export default function Navbar() {
 
-    const router = useRouter()
+  const router = useRouter()
 
     return (
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/70 border-b border-white/20 shadow-sm px-6 py-4">

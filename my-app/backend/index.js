@@ -220,6 +220,32 @@ app.post("/admin_accounts", (req, res) => {
   });
 });
 
+app.get("/lost_items", (req, res) => {
+  const q = `SELECT Description, Name, Status, Date, Floor_number, Location_Name, Address 
+             FROM finditdb.lost_item 
+             JOIN finditdb.location ON lost_item.Location_id = location.Location_id`;
+
+  db.query(q, (err, data) => {
+    if (err) {
+      console.error("Database query error:", err);
+      return res.status(500).json({ error: "Internal server error." });
+    }
+    return res.json(data);
+  });
+});
+
+app.get("/claim_items", (req, res) => {
+  const q = "SELECT * FROM finditdb.claim";
+
+  db.query(q, (err, data) => {
+    if (err) {
+      console.error("Database query error:", err);
+      return res.status(500).json({ error: "Internal server error." });
+    }
+    return res.json(data);
+  });
+});
+
 app.listen(8800, () => {
     console.log("Connected to backend for FindIt.");
 });

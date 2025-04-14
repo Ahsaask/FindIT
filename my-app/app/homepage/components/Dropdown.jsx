@@ -8,9 +8,7 @@ export default function Dropdown() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState('Select Course');
 
-    const languages = ['DSA Self Placed', 'JavaScript',
-                       'Python', 'Java', 'C++', 'Ruby',
-                       'Go', 'TypeScript'];
+    const item = ['Electronics', 'Bag', 'iPhone', 'Bacpack', 'Airpods'];
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -44,7 +42,7 @@ export default function Dropdown() {
                                     shadow-lg bg-white ring-1 ring-black
                                     ring-opacity-5 focus:outline-none">
                         <div className="py-1">
-                            {languages.map((language, index) => (
+                            {item.map((language, index) => (
                                 <a
                                     key={index}
                                     href="#"
