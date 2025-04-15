@@ -84,13 +84,15 @@ const handleLogin = async (e) => {
       if (endpoint) {
         const response = await axios.post(endpoint, infoAccount);
         if (response.data && response.data.success) {
-          const user = response.data.user;
-          console.log(user)
-          // Store user info in localStorage (or cookies, or global state like Redux)
           localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userId', user.Finder_ID_number);
-
-          router.push('/homepage');
+          localStorage.setItem('userRole', userMode); 
+        
+          // Redirect based on user type
+          if (userMode === "adminUser") {
+            router.push('/admin'); // Redirect admins to admin panel
+          } else {
+            router.push('/homepage'); // Regular users go to homepage
+          }
         } else {
           setEmailError("Invalid credentials.");
         }

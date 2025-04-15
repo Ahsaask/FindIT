@@ -193,7 +193,7 @@ app.get("/admin_accounts", (req, res) => {
 });
 
 app.post("/admin_account", (req, res) => {
-  const q = "SELECT * FROM owner WHERE Password = ? AND Email = ?";
+  const q = "SELECT * FROM admin WHERE Password = ? AND Email = ?";
 
   // test with existing account
   // const values = [
@@ -247,7 +247,7 @@ app.post("/admin_accounts", (req, res) => {
 });
 
 app.get("/lost_items", (req, res) => {
-  const q = `SELECT Description, Name, Status, Date, Floor_number, Location_Name, Address 
+  const q = `SELECT lost_item.LostItem_ID, Description, Name, Status, Date, Floor_number, Location_Name, Address 
              FROM finditdb.lost_item 
              JOIN finditdb.location ON lost_item.Location_id = location.Location_id`;
 
@@ -480,6 +480,68 @@ app.put("/update_owner_name", (req, res) => {
     return res.json({ success: true, data });
   });
 });
+
+// Update an item (for admin)
+app.put("/update_item/:id", (req, res) => {
+  const itemId = req.params.id;
+  const { Name, Description, Status } = req.body;
+  
+  const q = "UPDATE lost_item SET Name = ?, Description = ?, Status = ? WHERE LostItem_ID = ?";
+  
+  db.query(q, [Name, Description, Status, itemId], (err, data) => {
+    if (err) {
+      console.error("Error updating item:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Item updated successfully" });
+  });
+});
+
+// Delete an item (for admin)
+app.delete("/delete_item/:id", (req, res) => {
+  const itemId = req.params.id;
+  
+  const q = "DELETE FROM lost_item WHERE LostItem_ID = ?";
+  
+  db.query(q, [itemId], (err, data) => {
+    if (err) {
+      console.error("Error deleting item:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Item deleted successfully" });
+  });
+});
+
+// Delete a finder (for admin)
+app.delete("/delete_finder/:id", (req, res) => {
+  const finderId = req.params.id;
+  
+  const q = "DELETE FROM finder WHERE Finder_ID_number = ?";
+  
+  db.query(q, [finderId], (err, data) => {
+    if (err) {
+      console.error("Error deleting finder:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Finder deleted successfully" });
+  });
+});
+
+// Delete an owner (for admin)
+app.delete("/delete_owner/:id", (req, res) => {
+  const ownerId = req.params.id;
+  
+  const q = "DELETE FROM owner WHERE Owner_ID_number = ?";
+  
+  db.query(q, [ownerId], (err, data) => {
+    if (err) {
+      console.error("Error deleting owner:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Owner deleted successfully" });
+  });
+});
+
 
 app.listen(8800, () => {
     console.log("Connected to backend for FindIt.");
