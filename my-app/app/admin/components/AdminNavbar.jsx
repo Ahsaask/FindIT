@@ -14,7 +14,7 @@ export default function AdminNavbar() {
     const userRole = localStorage.getItem('userRole');
     
     if (!loggedIn || userRole !== 'adminUser') {
-      router.push('/login');
+      router.push('/Login');
     } else {
       setIsAdmin(true);
     }
@@ -23,7 +23,7 @@ export default function AdminNavbar() {
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userRole');
-    router.push('/login');
+    router.push('/Login');
   };
 
   return (
