@@ -45,11 +45,12 @@ export default function page() {
   return (
     <div>
       <Navbar/>
-      <div className='my-24 grid grid-cols-1 gap-6 mb-8 mx-10'>
+      <button onClick={() => router.push('/create-post')} className='mt-24 px-8 py-2 mx-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-lg rounded-lg border shadow-sm'>Create New Post</button>
+      <div className='my-8 grid grid-cols-1 gap-6 mb-8 mx-10'>
         {posts.map((post, index) => (
             <div
               key={index}
-              className="bg-blue-50 p-6 rounded-lg shadow-md text-left transition relative flex items-start w-full cursor-pointer"
+              className="bg-blue-50 hover:bg-blue-100 p-6 rounded-lg shadow-md text-left transition relative flex items-start w-full cursor-pointer"
             >
               <Image
                 src={defaultprofile}
@@ -76,7 +77,9 @@ export default function page() {
                     <Image
                       src={post.Image}
                       alt={post.Title || "Post Image"} // Fallback alt text
-                      className="max-w-xl"
+                      className="max-w-xl h-auto"
+                      width={600} // Replace with appropriate width
+                      height={400} // Replace with appropriate height
                     />
                   </div>
                 )}

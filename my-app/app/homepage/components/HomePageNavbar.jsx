@@ -69,7 +69,7 @@ export default function Navbar() {
             <p className="font-semibold text-xl">FindIT</p>
         </button>
         <div className='inline-flex items-center gap-3'>
-            <FaRegBell className='cursor-pointer'/>
+            <FaRegBell className='cursor-pointer hover:text-blue-500'/>
             {/* Template Profile Pick */}
             <Image src={defaultprofile} alt='Profile Picture' className=" w-10 h-10 rounded-full object-cover cursor-pointer" onClick={() => setOpenProfilePic(!openProfilePic)}/>
             {openProfilePic && (

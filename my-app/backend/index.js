@@ -11,7 +11,7 @@ const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   // password: "Blade4844912", 
-  password: "#@32!Admin99" ,
+  password: "#@32!Admin99",
   database: "finditdb",
 });
 
@@ -306,14 +306,27 @@ app.get("/posts", (req, res) => {
   const q = `SELECT post.Title, Content, Year, Day, Month, Image 
             FROM finditdb.post
             JOIN finditdb.post_date ON post.Title=post_date.Title
-            JOIN finditdb.post_image ON post_date.Title=post_image.Title`;
+            JOIN finditdb.post_image ON post_date.Title=post_image.Title
+            ORDER BY Year DESC, Month DESC, Day DESC`;
 
   db.query(q, (err, data) => {
     if (err) {
       console.error("Database query error:", err);
       return res.status(500).json({ error: "Internal server error." });
     }
-    return res.json(data);
+    // ✅ Convert each image buffer to base64 data URL
+    const processedData = data.map(post => {
+      if (post.Image) {
+        const base64Image = Buffer.from(post.Image).toString("base64");
+        return {
+          ...post,
+          Image: `data:image/jpeg;base64,${base64Image}` // or png/gif depending on your images
+        };
+      }
+      return post;
+    });
+
+    return res.json(processedData);
   });
 });
 
@@ -542,6 +555,77 @@ app.delete("/delete_owner/:id", (req, res) => {
   });
 });
 
+
+app.post("/add_post_content",  (req, res) => {
+  const q = "INSERT INTO post(`Title`, `Content`) VALUES (?, ?)";
+
+  const values = [
+    req.body.Title,
+    req.body.Content,
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to create post content" });
+    }
+    return res.json({ success: true, data });
+  });
+});
+
+app.post("/add_post_date",  (req, res) => {
+  const q = "INSERT INTO post_date(`Title`, `Year`, `Day`, `Month`) VALUES (?, ?, ?, ?)";
+
+  const values = [
+    req.body.Title,
+    req.body.Year,
+    req.body.Day,
+    req.body.Month,
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to create post date"});
+    }
+    return res.json({ success: true, data });
+  });
+});
+
+app.post('/add_post_image', (req, res) => {
+  const { Title, Image } = req.body;
+
+  if (!Image) {
+    // Insert with NULL if no image is provided
+    db.query("INSERT INTO post_image (Title, Image) VALUES (?, NULL)", [Title], (err, result) => {
+      if (err) {
+        console.error("Insert NULL image error:", err);
+        return res.status(500).send("Error inserting null image.");
+      }
+      res.send("Image not provided, inserted null.");
+    });
+  } else {
+    try {
+      // Convert base64 to binary buffer
+      const buffer = Buffer.from(Image.split(",")[1], "base64");
+
+      // Insert buffer into BLOB column
+      db.query("INSERT INTO post_image (Title, Image) VALUES (?, ?)", [Title, buffer], (err, result) => {
+        if (err) {
+          console.error("Insert image error:", err);
+          return res.status(500).send("Error inserting image.");
+        }
+        res.send("Image uploaded successfully.");
+      });
+    } catch (error) {
+      console.error("Buffer conversion error:", error);
+      return res.status(500).send("Failed to process image.");
+    }
+  }
+});
+
+app.use(express.json({ limit: '1gb' })); // Allow large payloads if using base64
+app.use(express.urlencoded({ limit: '1gb', extended: true }));
 
 app.listen(8800, () => {
     console.log("Connected to backend for FindIt.");

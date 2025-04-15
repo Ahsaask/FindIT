@@ -169,22 +169,22 @@ export default function Home() {
                         <p className="text-lg font-semibold">Quick Actions</p>
                         <hr className='border-1 my-5'></hr>
                         <div className='grid grid-cols-2 gap-6'>
-                            <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3'>
+                            <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3 hover:bg-gray-100'>
                                 <IoIosAdd className='text-blue-500 text-3xl'/>
                                 <p className='font-semibold text-sm'>Add Item</p>
                             </button>
 
-                            <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3'>
+                            <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3 hover:bg-gray-100'>
                                 <IoSearch className='text-blue-500 text-3xl'/>
                                 <p className='font-semibold text-sm'>Search Items</p>
                             </button>
 
-                            <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3'>
+                            <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3 hover:bg-gray-100'>
                                 <FaMessage className='text-blue-500 text-3xl'/>
                                 <p className='font-semibold text-sm'>Messages</p>
                             </button>
 
-                            <button onClick={() => router.push('/view-posts')} className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3'>
+                            <button onClick={() => router.push('/view-posts')} className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3 hover:bg-gray-100'>
                                 <IoMdSettings className='text-blue-500 text-3xl'/>
                                 <p className='font-semibold text-sm'>View Posts</p>
                             </button>

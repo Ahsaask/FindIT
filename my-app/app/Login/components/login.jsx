@@ -85,7 +85,15 @@ const handleLogin = async (e) => {
         const response = await axios.post(endpoint, infoAccount);
         if (response.data && response.data.success) {
           localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userRole', userMode); 
+          localStorage.setItem('userRole', userMode);
+
+          if (userMode === "finderUser") {
+            localStorage.setItem('userId', response.data.user.Finder_ID_number);
+          } else if (userMode === "adminUser") {
+            localStorage.setItem('userId', response.data.user.Admin_ID_number);
+          } else if (userMode === "ownerUser") {
+            localStorage.setItem('userId', response.data.user.Owner_ID_number);
+          }
         
           // Redirect based on user type
           if (userMode === "adminUser") {
