@@ -303,10 +303,13 @@ app.post("/get_user_profile", (req, res) => {
 });
 
 app.get("/posts", (req, res) => {
-  const q = `SELECT post.Title, Content, Year, Day, Month, Image 
+  const q = `SELECT post.Title, Content, Year, Day, Month, post_image.Image AS PostImage, profile.Image AS ProfileImage, First_name, Last_name 
             FROM finditdb.post
             JOIN finditdb.post_date ON post.Title=post_date.Title
-            JOIN finditdb.post_image ON post_date.Title=post_image.Title
+            LEFT JOIN finditdb.post_image ON post_date.Title=post_image.Title
+            JOIN finditdb.finder ON post.Finder_ID_number=finder.Finder_ID_number
+            JOIN finditdb.finder_name ON finder_name.Finder_ID_number = finder.Finder_ID_number
+            JOIN finditdb.profile ON finder_name.Mobile_no = profile.Mobile_no
             ORDER BY Year DESC, Month DESC, Day DESC`;
 
   db.query(q, (err, data) => {
@@ -316,14 +319,14 @@ app.get("/posts", (req, res) => {
     }
     // ✅ Convert each image buffer to base64 data URL
     const processedData = data.map(post => {
-      if (post.Image) {
-        const base64Image = Buffer.from(post.Image).toString("base64");
-        return {
-          ...post,
-          Image: `data:image/jpeg;base64,${base64Image}` // or png/gif depending on your images
-        };
+      const processedPost = { ...post };
+      if (post.PostImage) {
+        processedPost.PostImage = `data:image/jpeg;base64,${Buffer.from(post.PostImage).toString("base64")}`;
       }
-      return post;
+      if (post.ProfileImage) {
+        processedPost.ProfileImage = `data:image/jpeg;base64,${Buffer.from(post.ProfileImage).toString("base64")}`;
+      }
+      return processedPost;
     });
 
     return res.json(processedData);
@@ -557,11 +560,12 @@ app.delete("/delete_owner/:id", (req, res) => {
 
 
 app.post("/add_post_content",  (req, res) => {
-  const q = "INSERT INTO post(`Title`, `Content`) VALUES (?, ?)";
+  const q = "INSERT INTO post(`Title`, `Content`, `Finder_ID_number`) VALUES (?, ?, ?)";
 
   const values = [
     req.body.Title,
     req.body.Content,
+    req.body.Finder_ID_number,
   ];
   
   db.query(q, values, (err, data) => {

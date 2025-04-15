@@ -3,21 +3,28 @@
 import React from 'react'
 import axios from 'axios';
 // Removed unused import
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import HomeNavbar from '../homepage/components/HomepageNavbar';
+import HomeNavbar from '../homepage/components/HomePageNavbar';
 
 export default function page() {
+  const [userid, setUserID] = useState("");
+
+  useEffect(() => {
+    const storedID = localStorage.getItem('userId');
+    if (storedID) {
+      setUserID(storedID);
+      setContent((prev) => ({
+        ...prev,
+        finderid: storedID,
+      }));
+    }
+  }, []);
 
   const [content, setContent] = useState({
     title: "",
-    content: ""
-  });
-
-  const [postdate, setpostdate] = useState({
-    day: "",
-    month: "",
-    year: ""
+    content: "",
+    finderid: userid,
   });
 
   const [postimg, setPostImg] = useState(null); // Removed unused setter
@@ -31,45 +38,53 @@ export default function page() {
     e.preventDefault();
 
     console.log(content)
+
+    if (postimg?.Image) {
+      const base64Length = postimg.Image.length;
+      const approxImageSizeKB = (base64Length * (3 / 4)) / 1024;
+      const approxImageSizeGB = approxImageSizeKB / (1024 * 1024);
+
+      if (approxImageSizeGB > 1) {
+        alert("Image is too large. Please upload an image under 1GB.");
+        return;
+      }
+    }
     
     const currentDate = new Date();
-    setpostdate({
-      day: currentDate.getDate(),
-      month: currentDate.getMonth() + 1, // Months are zero-based
-      year: currentDate.getFullYear()
-    });
-    
-    console.log(postdate)
-    
+
     try {
-      // On handlePost
-      await axios.post("http://localhost:8800/add_post_content", {
+      // Start API requests
+      const res1 = await axios.post("http://localhost:8800/add_post_content", {
         Title: content.title,
         Content: content.content,
+        Finder_ID_number: content.finderid
       });
-      await axios.post("http://localhost:8800/add_post_date", {
+
+      if (res1.status !== 200) throw new Error("Content post failed");
+
+      const res2 = await axios.post("http://localhost:8800/add_post_date", {
         Title: content.title,
         Year: currentDate.getFullYear(),
         Month: currentDate.getMonth() + 1,
         Day: currentDate.getDate(),
       });
-      if (postimg?.Image) {
-        await axios.post("http://localhost:8800/add_post_image", {
-          Title: content.title,
-          Image: postimg.Image,
-        });
-      } else {
-        await axios.post("http://localhost:8800/add_post_image", {
-          Title: content.title,
-          Image: null,
-        });
-      }
 
-      router.push('/view-posts')
+      if (res2.status !== 200) throw new Error("Date post failed");
+
+      const res3 = await axios.post("http://localhost:8800/add_post_image", {
+        Title: content.title,
+        Image: postimg?.Image || null,
+      });
+
+      if (res3.status !== 200) throw new Error("Image post failed");
+
+      router.push('/view-posts');
+
     } catch (err) {
-      console.log(err);
+      console.error("Error during posting:", err);
+      alert("Failed to post. Please try again.");
     }
-  };
+};
   
 
   return (
@@ -85,7 +100,7 @@ export default function page() {
                 type="text"
                 value={content.title}
                 placeholder="Title (Required)"
-                onChange={(e) => setContent({title: e.target.value })}
+                onChange={(e) => setContent({ ...content, title: e.target.value })}
                 className=" placeholder:italic pt-4 px-4 pb-2 text-2xl font-semibold bg-transparent outline-none flex-1"
               />
             </div>
