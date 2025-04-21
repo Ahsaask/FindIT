@@ -9,7 +9,26 @@ import HomeNavbar from '../homepage/components/HomePageNavbar';
 
 export default function page() {
   const [userid, setUserID] = useState("");
+  const [currentUserRole, setUserRole] = useState("");
 
+  const router = useRouter()
+  
+  useEffect(() => {
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const userRole = localStorage.getItem('userRole');
+    if (!loggedIn) {
+      router.push('/Login');
+      return;
+    }
+
+    if (userRole !== 'finderUser') {
+      router.push('/homepage');
+      return;
+    }
+
+    setUserRole(userRole); // This is now safe
+  }, [router]);
+  
   useEffect(() => {
     const storedID = localStorage.getItem('userId');
     if (storedID) {
@@ -20,18 +39,17 @@ export default function page() {
       }));
     }
   }, []);
-
+  
   const [content, setContent] = useState({
     title: "",
     content: "",
     finderid: userid,
   });
 
-  const [postimg, setPostImg] = useState(null); // Removed unused setter
+  const [postimg, setPostImg] = useState(null); 
 
-  const router = useRouter()
   const handleChange = (e) => {
-    setContent({ ...content, content: e.target.value }); // Corrected parameter usage
+    setContent({ ...content, content: e.target.value }); 
   }
 
   const handlePost = async (e) => {
@@ -90,9 +108,9 @@ export default function page() {
   return (
     <div>
       <HomeNavbar/>
-      <div className="flex-1 p-6 mt-24 mx-36 transition bg-blue-100 rounded-md">
-        <p className="text-center text-3xl font-bold"></p>
-        <div className="rounded-md m-auto max-w-5xl">
+      <div className="flex-1 transition my-6 m-auto max-w-5xl">
+        <p className="mt-36 text-left text-4xl font-bold ">Create Post</p>
+        <div className="rounded-md bg-blue-100 p-6 my-8">
           <div className="TextEditor">
             {/* Input Title */}
             <div className="top-0 left-0 px-4 py-1 flex items-center w-full mt-4 lg:mt-0">

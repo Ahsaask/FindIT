@@ -62,18 +62,12 @@ export default function ProfilePage() {
           console.log("Profile data:", user);
           
           // Process the image data if it exists
-          let imageData = null;
-          if (user.Image) {
-            // If Image is already a base64 string that starts with data:image
-            if (typeof user.Image === 'string' && user.Image.startsWith('data:image')) {
-              imageData = user.Image;
-            } 
-            // If Image is a Buffer or other format that needs to be converted
-            else {
-              imageData = `data:image/jpeg;base64,${user.Image}`;
-            }
-            setProfileImage(imageData);
-          }
+          const imageData = typeof user.Image === 'string' && user.Image.startsWith('data:image')
+          ? user.Image
+          : null;
+
+          setProfileImage(imageData);
+          
           
           setProfile({
             firstName: user.First_name || '',
@@ -144,8 +138,8 @@ export default function ProfilePage() {
               <div className="absolute -bottom-16 left-8">
                 <div className="relative h-32 w-32 rounded-full border-4 border-white overflow-hidden bg-white">
                 <Image 
-                    src={defaultProfile} 
-                    alt="Default Profile" 
+                    src={profile.image || defaultProfile} 
+                    alt="Profile Picture" 
                     fill
                     className="object-cover"
                     />
@@ -191,7 +185,7 @@ export default function ProfilePage() {
                 </div>
               </div>
               
-              <div className="mt-8 flex justify-center">
+              <div className="mt-14 flex justify-center">
                 <button 
                   onClick={() => setEditMode(true)}
                   className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition"

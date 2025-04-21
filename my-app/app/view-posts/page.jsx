@@ -13,6 +13,20 @@ import defaultprofile from '../../assets/default.png';
 export default function page() {
 
   const [posts, setPosts] = useState([]);
+  const [currentUserRole, setUserRole] = useState("");
+  
+    const router = useRouter()
+    
+    useEffect(() => {
+      const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const userRole = localStorage.getItem('userRole');
+      if (!loggedIn) {
+        router.push('/Login');
+        return;
+      }
+  
+      setUserRole(userRole); // This is now safe
+    }, [router]);
 
   useEffect(() => {
     const fetchAllPosts = async () => {
@@ -30,8 +44,6 @@ export default function page() {
     fetchAllPosts();
   }, []);
 
-  const router = useRouter();
-
   useEffect(() => {
     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
@@ -41,14 +53,14 @@ export default function page() {
   }, [router]);
 
   return (
-    <div>
+    <div className='mt-24'>
       <Navbar />
-      <button onClick={() => router.push('/create-post')} className='mt-24 px-8 py-2 mx-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-lg rounded-lg border shadow-sm'>Create New Post</button>
+      {currentUserRole === 'finderUser' && (<button onClick={() => router.push('/create-post')} className='px-8 py-2 mx-10 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-lg rounded-lg border shadow-sm'>Create New Post</button>)}
       <div className='my-8 grid grid-cols-1 gap-6 mb-8 mx-10'>
         {posts.map((post, index) => (
           <div
             key={index}
-            className="bg-blue-50 hover:bg-blue-100 p-6 rounded-lg shadow-md text-left transition relative flex items-start w-full cursor-pointer"
+            className="bg-blue-50 hover:bg-blue-100 p-6 rounded-lg shadow-md text-left transition relative flex items-start w-full cursor-pointer overflow-auto"
           >
             <Image
               src={post.ProfileImage || defaultprofile} // Fallback to default profile image

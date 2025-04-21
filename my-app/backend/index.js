@@ -10,8 +10,8 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  // password: "Blade4844912", 
-  password: "#@32!Admin99",
+  password: "Blade4844912", 
+  // password: "#@32!Admin99",
   database: "finditdb",
 });
 
@@ -298,7 +298,21 @@ app.post("/get_user_profile", (req, res) => {
       return res.status(500).json({ error: "Database error." });
     }
 
-    return res.json({ success: true, user: data[0] });
+    if (!data || data.length === 0) {
+      return res.status(404).json({ error: "Profile not found." });
+    }
+
+    const user = data[0];
+
+    // Convert image BLOB to base64
+    if (user.Image) {
+      // const base64Image = Buffer.from(user.Image).toString('base64');
+      user.Image = `data:image/jpeg;base64,${Buffer.from(user.Image).toString("base64")}`;
+    } else {
+      user.Image = null
+    }
+
+    return res.json({ success: true, user });
   });
 });
 
@@ -317,7 +331,7 @@ app.get("/posts", (req, res) => {
       console.error("Database query error:", err);
       return res.status(500).json({ error: "Internal server error." });
     }
-    // ✅ Convert each image buffer to base64 data URL
+    // Convert each image buffer to base64 data URL
     const processedData = data.map(post => {
       const processedPost = { ...post };
       if (post.PostImage) {
@@ -422,25 +436,36 @@ app.put("/update_owner_mobile", (req, res) => {
 
 
 app.put("/update_profile", (req, res) => {
+  const bio = req.body.Bio || null;
+  const mobileNo = req.body.Mobile_no;
+  let image = req.body.Image;
 
+  // Decode base64 image to Buffer if image is provided
+  if (!image || image === "null" || image === "") {
+    image = null;
+  } else {
+    try {
+      const base64Data = image.split(',')[1]; // Remove data:image/...;base64,
+      image = Buffer.from(base64Data, 'base64');
+    } catch (err) {
+      console.error("Error decoding base64 image:", err);
+      return res.status(400).json({ error: "Invalid image format" });
+    }
+  }
+
+  // Construct SQL query and values
   let q;
   let values;
-  
-  if (req.body.Image !== null) {
+
+  if (image !== null) {
     q = "UPDATE profile SET Bio = ?, Image = ? WHERE Mobile_no = ?";
-    values = [
-      req.body.Bio || null,
-      req.body.Image,
-      req.body.Mobile_no
-    ];
+    values = [bio, image, mobileNo];
   } else {
-    q = "UPDATE profile SET Bio = ? WHERE Mobile_no = ?";
-    values = [
-      req.body.Bio || null,
-      req.body.Mobile_no
-    ];
+    q = "UPDATE profile SET Bio = ?, Image = NULL WHERE Mobile_no = ?";
+    values = [bio, mobileNo];
   }
-  
+
+  // Execute query
   db.query(q, values, (err, data) => {
     if (err) {
       console.error("Database error:", err);
@@ -881,6 +906,66 @@ app.delete("/delete_post/:title", (req, res) => {
 
 app.use(express.json({ limit: '1gb' })); // Allow large payloads if using base64
 app.use(express.urlencoded({ limit: '1gb', extended: true }));
+
+// add new lost_item for finder
+app.post('/add_lost_item', (req, res) => {
+  const q = "INSERT INTO lost_item(`Description`, `Name`, `Status`, `Date`, `Color_id`, `Location_id`, `Finder_ID_number`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+  const values = [
+    req.body.Description,
+    req.body.Name,
+    req.body.Status,
+    req.body.Date,
+    req.body.Color_id,
+    req.body.Location_id,
+    req.body.Finder_ID_number,
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to create post date"});
+    }
+    return res.json(data);
+  });
+});
+
+app.post('/add_lost_item_location', (req, res) => {
+  const q = "INSERT INTO location (`Floor_number`, `Location_Name`, `Address`) VALUES(?, ?, ?)";
+
+  const values = [
+    req.body.Floor_number,
+    req.body.Location_Name,
+    req.body.Address
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to create post date"});
+    }
+    return res.json(data);
+  });
+});
+
+app.post('/add_lost_item_specifications', (req, res) => {
+  const q = "INSERT INTO specifications(`Conditions`, `Size_Type`, `Category_Name`, `LostItem_ID`) VALUES (?, ?, ?, ?)";
+
+  const values = [
+    req.body.Conditions,
+    req.body.Size_Type,
+    req.body.Category_Name,
+    req.body.LostItem_ID,
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to create post date"});
+    }
+    return res.json(data);
+  });
+});
 
 app.listen(8800, () => {
     console.log("Connected to backend for FindIt.");

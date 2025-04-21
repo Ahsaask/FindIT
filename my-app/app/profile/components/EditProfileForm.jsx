@@ -66,6 +66,8 @@ export default function EditProfileForm({ profile, userId, userType, onUpdate, o
       return;
     }
 
+    console.log("Initial profile image:", profile.image);
+
     // Create preview and convert to base64
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -95,6 +97,8 @@ export default function EditProfileForm({ profile, userId, userType, onUpdate, o
     setLoading(true);
     setError(null);
 
+    console.log("submit updated profile has ran")
+
     try {
       // First create/update profile record
       const profileData = {
@@ -102,6 +106,8 @@ export default function EditProfileForm({ profile, userId, userType, onUpdate, o
         Bio: formData.bio,
         Image: formData.image, // Base64 encoded image
       };
+
+      console.log(profileData)
 
       // Check if profile exists using the get_user_profile endpoint
       const checkProfile = await axios.post('http://localhost:8800/get_user_profile', {
@@ -115,9 +121,9 @@ export default function EditProfileForm({ profile, userId, userType, onUpdate, o
       if (checkProfile.data && checkProfile.data.user) {
         // Profile exists, update it
         profileResponse = await axios.put('http://localhost:8800/update_profile', {
-          Mobile_no: formData.mobileNo,
-          Bio: formData.bio,
-          Image: formData.image,
+          Mobile_no: profileData.Mobile_no,
+          Bio: profileData.Bio,
+          Image: profileData.Image,
         });
       } else {
         // Profile doesn't exist, create it
@@ -159,12 +165,14 @@ export default function EditProfileForm({ profile, userId, userType, onUpdate, o
         // Also update owner table with mobile number
         await axios.put('http://localhost:8800/update_owner_mobile', {
           Owner_ID_number: userId,
-          Mobile_no: formData.mobileNo,
+          Mobile_no: nameData.mobileNo,
         });
       }
 
       // Show success message
       setSuccess(true);
+
+      // console.log(formData.firstName, formData.lastName, formData.mobileNo, formData.bio, formData.image)
       
       // Call the onUpdate callback with the updated profile
       onUpdate({
