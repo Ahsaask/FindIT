@@ -181,7 +181,14 @@ export default function Home() {
                                 <p className='font-semibold text-sm'>Search Items</p>
                             </button>
 
-                            <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3 hover:bg-gray-100'>
+                            {/* <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3 hover:bg-gray-100'>
+                                <FaMessage className='text-blue-500 text-3xl'/>
+                                <p className='font-semibold text-sm'>Messages</p>
+                            </button> */}
+                            <button 
+                                onClick={() => router.push('/messages')} 
+                                className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3 hover:bg-gray-100'
+                            >
                                 <FaMessage className='text-blue-500 text-3xl'/>
                                 <p className='font-semibold text-sm'>Messages</p>
                             </button>
