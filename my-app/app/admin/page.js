@@ -8,6 +8,7 @@ import AdminNavbar from "./components/AdminNavbar";
 export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [lostitems, setLostItems] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [users, setUsers] = useState({
     finders: [],
     owners: []
@@ -33,6 +34,10 @@ export default function AdminDashboard() {
       const itemsRes = await axios.get("http://localhost:8800/lost_items");
       setLostItems(itemsRes.data);
       
+      // Fetch posts
+      const postsRes = await axios.get("http://localhost:8800/posts");
+      setPosts(postsRes.data);
+      
       // Fetch users
       const findersRes = await axios.get("http://localhost:8800/finder_accounts");
       const ownersRes = await axios.get("http://localhost:8800/owner_accounts");
@@ -54,7 +59,7 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
           
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-lg font-semibold mb-2">Total Items</h2>
               <p className="text-3xl font-bold">{lostitems.length}</p>
@@ -63,6 +68,17 @@ export default function AdminDashboard() {
                 className="mt-4 text-blue-500 hover:text-blue-700"
               >
                 View All Items
+              </button>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-2">Total Posts</h2>
+              <p className="text-3xl font-bold">{posts.length}</p>
+              <button 
+                onClick={() => router.push('/admin/posts')}
+                className="mt-4 text-blue-500 hover:text-blue-700"
+              >
+                View All Posts
               </button>
             </div>
             
@@ -90,7 +106,8 @@ export default function AdminDashboard() {
             <ul className="list-disc pl-6 mb-4">
               <li>View and manage all lost and found items</li>
               <li>Edit item details such as description, name, and status</li>
-              <li>Remove items from the database</li>
+              <li>Manage all posts created by users</li>
+              <li>Edit post content and images</li>
               <li>Manage user accounts (finders and owners)</li>
               <li>View system statistics</li>
             </ul>

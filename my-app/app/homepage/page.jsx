@@ -138,6 +138,8 @@ export default function Home() {
                                 <td className="px-4 py-4 text-left">
                                     {item?.Status === "Found" ? (
                                         <p className='inline-block px-5 py-1 font-semibold text-green-900 bg-green-100 rounded-full border border-green-100'>Found</p>
+                                    ) : item?.Status === "Claimed" ? (
+                                        <p className='inline-block px-5 py-1 font-semibold text-blue-900 bg-blue-100 rounded-full border border-blue-100'>Claimed</p>
                                     ) : (
                                         <p className='inline-block px-5 py-1 font-semibold text-red-900 bg-red-100 rounded-full border border-red-100'>Lost</p>
                                     )}

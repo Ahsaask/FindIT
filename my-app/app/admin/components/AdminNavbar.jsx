@@ -43,6 +43,9 @@ export default function AdminNavbar() {
             <Link href="/admin/items" className="hover:text-blue-200">
               Items
             </Link>
+            <Link href="/admin/posts" className="hover:text-blue-200">
+              Posts
+            </Link>
             <Link href="/admin/users" className="hover:text-blue-200">
               Users
             </Link>

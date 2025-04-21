@@ -517,16 +517,61 @@ app.put("/update_item/:id", (req, res) => {
 app.delete("/delete_item/:id", (req, res) => {
   const itemId = req.params.id;
   
-  const q = "DELETE FROM lost_item WHERE LostItem_ID = ?";
-  
-  db.query(q, [itemId], (err, data) => {
+  db.beginTransaction((err) => {
     if (err) {
-      console.error("Error deleting item:", err);
+      console.error("Error starting transaction:", err);
       return res.status(500).json({ error: "Database error." });
     }
-    return res.json({ success: true, message: "Item deleted successfully" });
+    
+    db.query("UPDATE lost_item SET Claim_ID = NULL WHERE LostItem_ID = ?", [itemId], (err) => {
+      if (err) {
+        return db.rollback(() => {
+          console.error("Error nullifying claim reference:", err);
+          res.status(500).json({ error: "Database error." });
+        });
+      }
+      
+      db.query("DELETE FROM claim WHERE LostItem_ID = ?", [itemId], (err) => {
+        if (err) {
+          return db.rollback(() => {
+            console.error("Error deleting related claims:", err);
+            res.status(500).json({ error: "Database error." });
+          });
+        }
+        
+        db.query("DELETE FROM creates WHERE LostItem_ID = ?", [itemId], (err) => {
+          if (err) {
+            return db.rollback(() => {
+              console.error("Error deleting from creates:", err);
+              res.status(500).json({ error: "Database error." });
+            });
+          }
+          
+
+          db.query("DELETE FROM lost_item WHERE LostItem_ID = ?", [itemId], (err) => {
+            if (err) {
+              return db.rollback(() => {
+                console.error("Error deleting lost item:", err);
+                res.status(500).json({ error: "Database error." });
+              });
+            }
+            
+            db.commit((err) => {
+              if (err) {
+                return db.rollback(() => {
+                  console.error("Error committing transaction:", err);
+                  res.status(500).json({ error: "Database error." });
+                });
+              }
+              res.json({ success: true, message: "Item deleted successfully" });
+            });
+          });
+        });
+      });
+    });
   });
 });
+
 
 // Delete a finder (for admin)
 app.delete("/delete_finder/:id", (req, res) => {
@@ -626,6 +671,212 @@ app.post('/add_post_image', (req, res) => {
       return res.status(500).send("Failed to process image.");
     }
   }
+});
+
+// Update a post (for admin)
+app.put("/update_post/:title", (req, res) => {
+  const title = req.params.title;
+  const { Content, newTitle } = req.body;
+  
+  // If only updating content (not changing title)
+  if (!newTitle || newTitle === title) {
+    const q = "UPDATE post SET Content = ? WHERE Title = ?";
+    
+    db.query(q, [Content, title], (err, data) => {
+      if (err) {
+        console.error("Error updating post content:", err);
+        return res.status(500).json({ error: "Database error." });
+      }
+      return res.json({ success: true, message: "Post content updated successfully" });
+    });
+  } else {
+    // If updating title (need to update in multiple tables)
+    db.beginTransaction((err) => {
+      if (err) {
+        console.error("Error starting transaction:", err);
+        return res.status(500).json({ error: "Database error." });
+      }
+      
+      // Check if the post is referenced in creates table
+      db.query("SELECT * FROM creates WHERE Title = ?", [title], (err, createsResults) => {
+        if (err) {
+          return db.rollback(() => {
+            console.error("Error checking creates references:", err);
+            res.status(500).json({ error: "Database error." });
+          });
+        }
+        
+        // Check if the post is referenced in searches table
+        db.query("SELECT * FROM searches WHERE Title = ?", [title], (err, searchesResults) => {
+          if (err) {
+            return db.rollback(() => {
+              console.error("Error checking searches references:", err);
+              res.status(500).json({ error: "Database error." });
+            });
+          }
+          
+          // First update the post table
+          db.query("UPDATE post SET Title = ?, Content = ? WHERE Title = ?", 
+            [newTitle, Content, title], 
+            (err) => {
+              if (err) {
+                return db.rollback(() => {
+                  console.error("Error updating post title:", err);
+                  res.status(500).json({ error: "Database error." });
+                });
+              }
+              
+              // Then update post_date table
+              db.query("UPDATE post_date SET Title = ? WHERE Title = ?", 
+                [newTitle, title], 
+                (err) => {
+                  if (err) {
+                    return db.rollback(() => {
+                      console.error("Error updating post_date:", err);
+                      res.status(500).json({ error: "Database error." });
+                    });
+                  }
+                  
+                  // Update post_image table if it exists
+                  db.query("UPDATE post_image SET Title = ? WHERE Title = ?", 
+                    [newTitle, title], 
+                    (err) => {
+                      if (err) {
+                        return db.rollback(() => {
+                          console.error("Error updating post_image:", err);
+                          res.status(500).json({ error: "Database error." });
+                        });
+                      }
+                      
+                      // Now handle creates table if needed
+                      const updateCreates = createsResults.length > 0 
+                        ? new Promise((resolve, reject) => {
+                            db.query("UPDATE creates SET Title = ? WHERE Title = ?", [newTitle, title], (err) => {
+                              if (err) reject(err);
+                              else resolve();
+                            });
+                          }) 
+                        : Promise.resolve();
+                        
+                      // Handle searches table if needed
+                      const updateSearches = searchesResults.length > 0 
+                        ? new Promise((resolve, reject) => {
+                            db.query("UPDATE searches SET Title = ? WHERE Title = ?", [newTitle, title], (err) => {
+                              if (err) reject(err);
+                              else resolve();
+                            });
+                          }) 
+                        : Promise.resolve();
+                      
+                      // Execute updates for creates and searches if needed
+                      Promise.all([updateCreates, updateSearches])
+                        .then(() => {
+                          // Commit transaction
+                          db.commit((err) => {
+                            if (err) {
+                              return db.rollback(() => {
+                                console.error("Error committing transaction:", err);
+                                res.status(500).json({ error: "Database error." });
+                              });
+                            }
+                            res.json({ success: true, message: "Post updated successfully" });
+                          });
+                        })
+                        .catch(err => {
+                          db.rollback(() => {
+                            console.error("Error updating references:", err);
+                            res.status(500).json({ error: "Database error: " + err.message });
+                          });
+                        });
+                    }
+                  );
+                }
+              );
+            }
+          );
+        });
+      });
+    });
+  }
+});
+
+// Update a post image (for admin)
+app.put("/update_post_image/:title", (req, res) => {
+  const title = req.params.title;
+  const { Image } = req.body;
+
+  if (!Image) {
+    // Update with NULL if no image is provided
+    db.query("UPDATE post_image SET Image = NULL WHERE Title = ?", [title], (err, result) => {
+      if (err) {
+        console.error("Update NULL image error:", err);
+        return res.status(500).send("Error updating image to null.");
+      }
+      res.send("Image removed successfully.");
+    });
+  } else {
+    try {
+      // Convert base64 to binary buffer
+      const buffer = Buffer.from(Image.split(",")[1], "base64");
+
+      // Update buffer in BLOB column
+      db.query("UPDATE post_image SET Image = ? WHERE Title = ?", [buffer, title], (err, result) => {
+        if (err) {
+          console.error("Update image error:", err);
+          return res.status(500).send("Error updating image.");
+        }
+        res.send("Image updated successfully.");
+      });
+    } catch (error) {
+      console.error("Buffer conversion error:", error);
+      return res.status(500).send("Failed to process image.");
+    }
+  }
+});
+
+// Delete a post (for admin)
+app.delete("/delete_post/:title", (req, res) => {
+  const title = req.params.title;
+  
+  // We'll use a simpler approach - since we have ON DELETE CASCADE,
+  // we should be able to delete directly from the post table
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error("Error starting transaction:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    
+    db.query("DELETE FROM post WHERE Title = ?", [title], (err) => {
+      if (err) {
+        // If there's an error, try a manual approach
+        if (err.code === 'ER_ROW_IS_REFERENCED_2') {
+          return db.rollback(() => {
+            console.error("Error deleting post - it has references:", err);
+            res.status(400).json({ 
+              error: "Cannot delete this post as it's referenced by other data. Please contact the administrator."
+            });
+          });
+        } else {
+          // Some other error
+          return db.rollback(() => {
+            console.error("Error deleting post:", err);
+            res.status(500).json({ error: "Database error." });
+          });
+        }
+      }
+      
+      // If successful, commit transaction
+      db.commit((err) => {
+        if (err) {
+          return db.rollback(() => {
+            console.error("Error committing transaction:", err);
+            res.status(500).json({ error: "Database error." });
+          });
+        }
+        res.json({ success: true, message: "Post deleted successfully" });
+      });
+    });
+  });
 });
 
 app.use(express.json({ limit: '1gb' })); // Allow large payloads if using base64
