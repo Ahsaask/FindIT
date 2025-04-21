@@ -272,6 +272,25 @@ app.get("/claim_items", (req, res) => {
   });
 });
 
+app.post("/add_newclaim", (req, res) => {
+  const q = "INSERT INTO claim(`Owner_ID_number`, `LostItem_ID`, `Status`, `Text`) VALUES (?, ?, ?, ?)";
+  
+  const values = [
+    req.body.Owner_ID_number,
+    req.body.LostItem_ID,
+    req.body.Status,
+    req.body.Text
+  ];
+  
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to insert new claim" });
+    }
+    return res.json({ success: true, data });
+  });
+});
+
 app.post("/get_user_profile", (req, res) => {
   const q = `SELECT profile.Mobile_no, Bio, Image, First_name, Last_name
             FROM finditdb.finder

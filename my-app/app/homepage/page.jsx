@@ -11,17 +11,13 @@ import { FaRegBell } from "react-icons/fa";
 import { FaBox } from "react-icons/fa";
 import { FaArrowUp } from "react-icons/fa6";
 import { FaClipboardCheck } from "react-icons/fa6";
-import { GoGraph } from "react-icons/go";
-import { FaClock } from "react-icons/fa6";
-import { FaLaptop } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
-import { IoMdSettings } from "react-icons/io";
 import { FaMessage } from "react-icons/fa6";
-import { IoSearch } from "react-icons/io5";
 import { BsFileEarmarkPostFill } from "react-icons/bs";
 
 export default function Home() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userid, setUserID] = useState("");
     const router = useRouter();
 
     const [lostitems, setLostItems] = useState([]);
@@ -31,6 +27,15 @@ export default function Home() {
     const [currentUserRole, setUserRole] = useState("");
 
     const [showSubmitItem, setShowSubmitItem] = useState(false);
+    const [showClaimPopup, setShowClaimPopup] = useState(false);
+    const [claimText, setClaimText] = useState('');
+    const [selectedItemId, setSelectedItemId] = useState(null); // to track which item is being claimed
+
+    useEffect(() => {
+          const storedID = localStorage.getItem('userId');
+          setUserID(storedID);
+        }, []);
+
 
     useEffect(() => {
         const fetchAllLostItems = async () => {
@@ -79,6 +84,27 @@ export default function Home() {
 
     }, [router]);
 
+    const handleSubmitClaim = async (e) => {
+        e.preventDefault();
+        console.log("Submit claim for item ID:", selectedItemId, "OwnerID:", userid, "Text:", claimText, "Status:", "Pending");
+
+        try {
+            await axios.post("http://localhost:8800/add_newclaim", {
+                Owner_ID_number: userid,
+                LostItem_ID: selectedItemId,
+                Status: "Pending",
+                Text: claimText
+            });
+                                    
+            setShowClaimPopup(false);
+            setClaimText('');
+
+          } catch (err) {
+            console.log(err);
+            setError(true)
+          }
+    }
+
     return (
         <div className="my-24">
             <Navbar />
@@ -102,21 +128,8 @@ export default function Home() {
                         <FaClipboardCheck className="text-blue-500 text-xl" />
                     </div>
                     <p className="text-4xl font-bold mt-2">{numberOfClaims}</p>
-                    {/* <p className="text-orange-600 mt-2 flex items-center">
-                        <span className="mr-1"><FaClock /></span> 8 pending approval
-                    </p> */}
                 </div>
 
-                {/* <div className="box p-4 bg-white rounded-lg shadow-md">
-                    <div className="flex justify-between items-center">
-                        <p className="text-lg font-semibold">Success Rate</p>
-                        <GoGraph  className="text-blue-500 text-xl" />
-                    </div>
-                    <p className="text-4xl font-bold mt-2">89%</p>
-                    <p className="text-green-600 mt-2 flex items-center">
-                        <span className="mr-1"><FaArrowUp /></span> 5% from last month
-                    </p>
-                </div> */}
             </div>
 
             <div className="containerHome mt-10 box bg-white shadow-md overflow-auto">
@@ -154,7 +167,15 @@ export default function Home() {
                                 </td>
                                 <td className="px-4 py-4">{new Date(item.Date).toLocaleDateString('en-CA', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
                                 {currentUserRole==='ownerUser' && (
-                                    <td  className="px-4 py-4 text-blue-500 cursor-pointer">Make Claim</td>
+                                    <td
+                                    onClick={() => {
+                                      setSelectedItemId(item.LostItem_ID); // or the correct ID field
+                                      setShowClaimPopup(true);
+                                    }}
+                                    className="px-4 py-4 text-blue-500 cursor-pointer"
+                                  >
+                                    Make Claim
+                                  </td>
                                     )}
                             </tr>
                         ))}
@@ -186,11 +207,6 @@ export default function Home() {
                                 <p className='font-semibold text-sm'>Add Item</p>
                             </button>)}
 
-                            {/* <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3 hover:bg-gray-100'>
-                                <IoSearch className='text-blue-500 text-3xl'/>
-                                <p className='font-semibold text-sm'>Search Items</p>
-                            </button> */}
-
                             <button className='flex items-center border-dotted border-gray-300 border-2 rounded-lg flex-col py-3 hover:bg-gray-100'>
                                 <FaMessage className='text-blue-500 text-3xl'/>
                                 <p className='font-semibold text-sm'>Messages</p>
@@ -207,6 +223,38 @@ export default function Home() {
 
             {currentUserRole === 'finderUser' && showSubmitItem === true && (<ReportForm />)}
 
+            {showClaimPopup && (
+                <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
+                    <div className="bg-white rounded-xl p-6 shadow-md w-96">
+                        <h2 className="text-lg font-semibold mb-4">Submit Claim</h2>
+                        <textarea
+                            className="w-full h-28 border border-gray-300 rounded-md p-2 text-sm"
+                            placeholder="Enter your reason for claiming this item..."
+                            value={claimText}
+                            onChange={(e) => setClaimText(e.target.value)}
+                        />
+                        <div className="flex justify-end mt-4 gap-2">
+                            <button
+                                onClick={() => {
+                                    setShowClaimPopup(false);
+                                    setClaimText('');
+                                }}
+                                className="px-4 py-2 bg-gray-200 text-sm rounded-md hover:bg-gray-300"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSubmitClaim}
+                                className="px-4 py-2 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600"
+                            >
+                            Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
+        
     )
+    
 }
