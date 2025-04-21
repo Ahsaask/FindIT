@@ -34,7 +34,7 @@ export default function ProfilePage() {
     }
 
     const storedUserId = localStorage.getItem('userId');
-    const storedUserType = localStorage.getItem('userType');
+    const storedUserType = localStorage.getItem('userRole');
     
     if (!storedUserId) {
       router.push('/Login');
