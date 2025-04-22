@@ -36,6 +36,16 @@ CREATE TABLE `admin` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `admin`
+--
+
+LOCK TABLES admin WRITE;
+/*!40000 ALTER TABLE admin DISABLE KEYS */;
+INSERT INTO admin VALUES (1,'admin123','admin1@example.com','Super Admin','123-456-7890'),(2,'admin456','admin2@example.com','Moderator','987-654-3210'),(3,'admin789','admin3@example.com','Support','555-123-4567');
+/*!40000 ALTER TABLE admin ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `claim`
 --
 
@@ -60,6 +70,16 @@ CREATE TABLE claim (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `claim`
+--
+
+LOCK TABLES claim WRITE;
+/*!40000 ALTER TABLE claim DISABLE KEYS */;
+INSERT INTO claim VALUES (601,201,1,401,'Pending','I lost my iPhone in the library last week'),(602,202,2,402,'Approved','I can identify the contents of the backpack'),(603,203,3,403,'Denied','Description does not match the lost item');
+/*!40000 ALTER TABLE claim ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `creates`
 --
 
@@ -80,6 +100,16 @@ CREATE TABLE creates (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `creates`
+--
+
+LOCK TABLES creates WRITE;
+/*!40000 ALTER TABLE creates DISABLE KEYS */;
+INSERT INTO creates VALUES ('Lost iPhone in Library',401,101),('Missing Blue Backpack',402,102),('Lost AirPods in Student Center',403,103);
+/*!40000 ALTER TABLE creates ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `feedback`
 --
 
@@ -93,6 +123,16 @@ CREATE TABLE feedback (
   PRIMARY KEY (Feedback_ID)
 ) ENGINE=InnoDB AUTO_INCREMENT=1004 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `feedback`
+--
+
+LOCK TABLES feedback WRITE;
+/*!40000 ALTER TABLE feedback DISABLE KEYS */;
+INSERT INTO feedback VALUES (1001,'Great service! Got my item back quickly.','2025-02-18'),(1002,'Thank you for finding my backpack!','2025-02-23'),(1003,'Still looking for my AirPods.','2025-02-28');
+/*!40000 ALTER TABLE feedback ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `finder`
@@ -109,6 +149,16 @@ CREATE TABLE finder (
   UNIQUE KEY Email_UNIQUE (Email)
 ) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `finder`
+--
+
+LOCK TABLES finder WRITE;
+/*!40000 ALTER TABLE finder DISABLE KEYS */;
+INSERT INTO finder VALUES (101,'finder123','finder1@example.com'),(102,'finder456','finder2@example.com'),(103,'finder789','finder3@example.com');
+/*!40000 ALTER TABLE finder ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `finder_name`
@@ -133,6 +183,16 @@ CREATE TABLE finder_name (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `finder_name`
+--
+
+LOCK TABLES finder_name WRITE;
+/*!40000 ALTER TABLE finder_name DISABLE KEYS */;
+INSERT INTO finder_name VALUES (101,'John','Doe',1001,'111-222-3333'),(102,'Jane','Smith',1002,'444-555-6666'),(103,'Michael','Johnson',NULL,'777-888-9999');
+/*!40000 ALTER TABLE finder_name ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `location`
 --
 
@@ -147,6 +207,16 @@ CREATE TABLE location (
   PRIMARY KEY (Location_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=306 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `location`
+--
+
+LOCK TABLES location WRITE;
+/*!40000 ALTER TABLE location DISABLE KEYS */;
+INSERT INTO location VALUES (301,'1','Library','University Main Campus, 123 Learning St'),(302,'2','Cafeteria','University Main Campus, 123 Learning St'),(303,'G','Student Center','University Main Campus, 123 Learning St');
+/*!40000 ALTER TABLE location ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `lost_item`
@@ -178,6 +248,16 @@ CREATE TABLE lost_item (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `lost_item`
+--
+
+LOCK TABLES lost_item WRITE;
+/*!40000 ALTER TABLE lost_item DISABLE KEYS */;
+INSERT INTO lost_item VALUES (401,'iPhone 13 with cracked screen protector','iPhone','Found','2025-02-15',1,301,101,601),(402,'Blue Jansport backpack with psychology books','Backpack','Found','2025-02-20',2,302,102,602),(403,'Apple AirPods Pro in charging case','AirPods','Lost','2025-02-25',3,303,NULL,603);
+/*!40000 ALTER TABLE lost_item ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `message`
 --
 
@@ -199,6 +279,16 @@ CREATE TABLE message (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `message`
+--
+
+LOCK TABLES message WRITE;
+/*!40000 ALTER TABLE message DISABLE KEYS */;
+INSERT INTO message VALUES (201,101,701,'I found an iPhone that matches your description. Let\'s meet to verify.'),(202,102,702,'I found your backpack in the cafeteria. It\'s now at the lost and found office.'),(203,103,703,'I might have seen someone with your AirPods. I\'ll let you know if I get more info.');
+/*!40000 ALTER TABLE message ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `moderates`
 --
 
@@ -217,6 +307,16 @@ CREATE TABLE moderates (
   CONSTRAINT FK_mod_Owner_ID_number FOREIGN KEY (Owner_ID_number) REFERENCES `owner` (Owner_ID_number) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `moderates`
+--
+
+LOCK TABLES moderates WRITE;
+/*!40000 ALTER TABLE moderates DISABLE KEYS */;
+INSERT INTO moderates VALUES (1,101,201),(2,102,202),(3,103,203);
+/*!40000 ALTER TABLE moderates ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `notification`
@@ -243,6 +343,16 @@ CREATE TABLE notification (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `notification`
+--
+
+LOCK TABLES notification WRITE;
+/*!40000 ALTER TABLE notification DISABLE KEYS */;
+INSERT INTO notification VALUES (701,'2025-02-16 10:15:00','Read',NULL,101,201),(702,'2025-02-21 14:30:00','Unread',NULL,102,202),(703,'2025-02-26 09:45:00','Unread',1,NULL,203);
+/*!40000 ALTER TABLE notification ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `owner`
 --
 
@@ -262,6 +372,16 @@ CREATE TABLE `owner` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `owner`
+--
+
+LOCK TABLES owner WRITE;
+/*!40000 ALTER TABLE owner DISABLE KEYS */;
+INSERT INTO owner VALUES (201,'owner123','owner1@example.com','111-000-1111'),(202,'owner456','owner2@example.com','222-000-2222'),(203,'owner789','owner3@example.com','333-000-3333');
+/*!40000 ALTER TABLE owner ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `owner_name`
 --
 
@@ -279,6 +399,16 @@ CREATE TABLE owner_name (
   CONSTRAINT FK_Owner_name_Feedback_ID FOREIGN KEY (Feedback_ID) REFERENCES feedback (Feedback_ID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `owner_name`
+--
+
+LOCK TABLES owner_name WRITE;
+/*!40000 ALTER TABLE owner_name DISABLE KEYS */;
+INSERT INTO owner_name VALUES (201,'Robert','Williams',1001),(202,'Emma','Davis',1002),(203,'David','Miller',1003);
+/*!40000 ALTER TABLE owner_name ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `post`
@@ -303,6 +433,16 @@ CREATE TABLE post (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `post`
+--
+
+LOCK TABLES post WRITE;
+/*!40000 ALTER TABLE post DISABLE KEYS */;
+INSERT INTO post VALUES ('Lost AirPods in Student Center',803,'I lost my AirPods Pro in the student center yesterday. Please help!',3,NULL),('Lost iPhone in Library',801,'I lost my iPhone 13 in the library on Feb 15th. It has a black case with my ID inside.',1,NULL),('Missing Blue Backpack',802,'Has anyone found a blue Jansport backpack in the cafeteria? It has my psychology textbooks.',2,NULL);
+/*!40000 ALTER TABLE post ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `post_date`
 --
 
@@ -320,6 +460,16 @@ CREATE TABLE post_date (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `post_date`
+--
+
+LOCK TABLES post_date WRITE;
+/*!40000 ALTER TABLE post_date DISABLE KEYS */;
+INSERT INTO post_date VALUES ('Lost AirPods in Student Center',2025,25,2),('Lost iPhone in Library',2025,15,2),('Missing Blue Backpack',2025,20,2);
+/*!40000 ALTER TABLE post_date ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `post_image`
 --
 
@@ -335,6 +485,16 @@ CREATE TABLE post_image (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `post_image`
+--
+
+LOCK TABLES post_image WRITE;
+/*!40000 ALTER TABLE post_image DISABLE KEYS */;
+INSERT INTO post_image VALUES ('Lost AirPods in Student Center',NULL),('Lost iPhone in Library',NULL),('Missing Blue Backpack',NULL);
+/*!40000 ALTER TABLE post_image ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `profile`
 --
 
@@ -348,6 +508,16 @@ CREATE TABLE `profile` (
   PRIMARY KEY (Mobile_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `profile`
+--
+
+LOCK TABLES profile WRITE;
+/*!40000 ALTER TABLE profile DISABLE KEYS */;
+INSERT INTO profile VALUES ('111-000-1111','I frequently lose things on campus',NULL),('111-222-3333','Active finder of lost items',NULL),('222-000-2222','Psychology student',NULL),('333-000-3333','Engineering student',NULL),('444-555-6666','Campus security worker',NULL),('777-888-9999','Computer science student',NULL);
+/*!40000 ALTER TABLE profile ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `searches`
@@ -367,6 +537,16 @@ CREATE TABLE searches (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `searches`
+--
+
+LOCK TABLES searches WRITE;
+/*!40000 ALTER TABLE searches DISABLE KEYS */;
+INSERT INTO searches VALUES (203,'Lost AirPods in Student Center'),(201,'Lost iPhone in Library'),(202,'Missing Blue Backpack');
+/*!40000 ALTER TABLE searches ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `specification_color`
 --
 
@@ -379,6 +559,16 @@ CREATE TABLE specification_color (
   PRIMARY KEY (Color_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `specification_color`
+--
+
+LOCK TABLES specification_color WRITE;
+/*!40000 ALTER TABLE specification_color DISABLE KEYS */;
+INSERT INTO specification_color VALUES (1,'Black'),(2,'Blue'),(3,'White'),(4,'Silver'),(5,'Red');
+/*!40000 ALTER TABLE specification_color ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `specifications`
@@ -398,6 +588,16 @@ CREATE TABLE specifications (
   CONSTRAINT FK_specify_LostItem_ID FOREIGN KEY (LostItem_ID) REFERENCES lost_item (LostItem_ID)
 ) ENGINE=InnoDB AUTO_INCREMENT=506 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `specifications`
+--
+
+LOCK TABLES specifications WRITE;
+/*!40000 ALTER TABLE specifications DISABLE KEYS */;
+INSERT INTO specifications VALUES (501,'Good','Small','Electronic',401),(502,'Worn','Medium','Accessory',402),(503,'New','Small','Electronic',403);
+/*!40000 ALTER TABLE specifications ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -408,4 +608,4 @@ CREATE TABLE specifications (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-21 15:45:12
+-- Dump completed on 2025-04-22 17:36:13
