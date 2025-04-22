@@ -1055,6 +1055,153 @@ app.post("/get_notifications", (req, res) => {
   });
 });
 
+app.get("/conversations/:userType/:userId", (req, res) => {
+  const { userType, userId } = req.params;
+  
+  let q;
+  if (userType === 'finder') {
+    q = `
+      SELECT c.Owner_ID_number, c.First_name, c.Last_name, c.LastMessageDate, n.Seen_Status
+      FROM (
+        SELECT m.Owner_ID_number, own.First_name, own.Last_name, 
+              MAX(n.Date) as LastMessageDate, MAX(n.Notify_id) as LastNotifyId
+        FROM message m
+        JOIN notification n ON m.Notify_ID = n.Notify_id
+        JOIN owner_name own ON m.Owner_ID_number = own.Owner_ID_number
+        WHERE m.Finder_ID_number = ?
+        GROUP BY m.Owner_ID_number, own.First_name, own.Last_name
+      ) c
+      JOIN notification n ON n.Notify_id = c.LastNotifyId
+      ORDER BY c.LastMessageDate DESC
+    `;
+  } else {
+    q = `
+      SELECT c.Finder_ID_number, c.First_name, c.Last_name, c.LastMessageDate, n.Seen_Status
+      FROM (
+        SELECT m.Finder_ID_number, fn.First_name, fn.Last_name, 
+              MAX(n.Date) as LastMessageDate, MAX(n.Notify_id) as LastNotifyId
+        FROM message m
+        JOIN notification n ON m.Notify_ID = n.Notify_id
+        JOIN finder_name fn ON m.Finder_ID_number = fn.Finder_ID_number
+        WHERE m.Owner_ID_number = ?
+        GROUP BY m.Finder_ID_number, fn.First_name, fn.Last_name
+      ) c
+      JOIN notification n ON n.Notify_id = c.LastNotifyId
+      ORDER BY c.LastMessageDate DESC
+    `;
+  }
+  
+  db.query(q, [userId], (err, data) => {
+    if (err) {
+      console.error("Error retrieving conversations:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json(data);
+  });
+});
+
+app.get("/messages/:finderId/:ownerId", (req, res) => {
+  const { finderId, ownerId } = req.params;
+  
+  const q = `
+    SELECT m.Owner_ID_number, m.Finder_ID_number, m.Notify_ID, m.Text, n.Date, n.Seen_Status, 
+           fn.First_name as FinderFirstName, fn.Last_name as FinderLastName, 
+           own.First_name as OwnerFirstName, own.Last_name as OwnerLastName
+    FROM message m
+    JOIN notification n ON m.Notify_ID = n.Notify_id
+    JOIN finder_name fn ON m.Finder_ID_number = fn.Finder_ID_number
+    JOIN owner_name own ON m.Owner_ID_number = own.Owner_ID_number
+    WHERE m.Finder_ID_number = ? AND m.Owner_ID_number = ?
+    ORDER BY n.Date ASC
+  `;
+  
+  db.query(q, [finderId, ownerId], (err, data) => {
+    if (err) {
+      console.error("Error retrieving messages:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json(data);
+  });
+});
+
+// Send a new message
+app.post("/send-message", (req, res) => {
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error("Error starting transaction:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    
+    // Create notification first
+    const notificationQuery = `
+      INSERT INTO notification (Date, Seen_Status, Finder_ID_number, Owner_ID_number)
+      VALUES (NOW(), 'Unread', ?, ?)
+    `;
+    
+    db.query(notificationQuery, [req.body.FinderId, req.body.OwnerId], (err, notificationResult) => {
+      if (err) {
+        return db.rollback(() => {
+          console.error("Error creating notification:", err);
+          res.status(500).json({ error: "Database error." });
+        });
+      }
+      
+      const notifyId = notificationResult.insertId;
+      
+      // Now insert the message
+      const messageQuery = `
+        INSERT INTO message (Owner_ID_number, Finder_ID_number, Notify_ID, Text)
+        VALUES (?, ?, ?, ?)
+      `;
+      
+      db.query(messageQuery, [req.body.OwnerId, req.body.FinderId, notifyId, req.body.Text], (err) => {
+        if (err) {
+          return db.rollback(() => {
+            console.error("Error creating message:", err);
+            res.status(500).json({ error: "Database error." });
+          });
+        }
+        
+        db.commit((err) => {
+          if (err) {
+            return db.rollback(() => {
+              console.error("Error committing transaction:", err);
+              res.status(500).json({ error: "Database error." });
+            });
+          }
+          
+          res.json({ 
+            success: true, 
+            message: "Message sent successfully", 
+            notifyId: notifyId 
+          });
+        });
+      });
+    });
+  });
+});
+
+// Mark messages as read
+app.put("/mark-as-read", (req, res) => {
+  const { notifyIds } = req.body; // Array of notification IDs
+  
+  if (!notifyIds || !notifyIds.length) {
+    return res.status(400).json({ error: "No notification IDs provided." });
+  }
+  
+  const placeholders = notifyIds.map(() => '?').join(',');
+  const q = `UPDATE notification SET Seen_Status = 'Read' WHERE Notify_id IN (${placeholders})`;
+  
+  db.query(q, notifyIds, (err, data) => {
+    if (err) {
+      console.error("Error marking messages as read:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Messages marked as read" });
+  });
+});
+
+
 app.listen(8800, () => {
     console.log("Connected to backend for FindIt.");
 });
