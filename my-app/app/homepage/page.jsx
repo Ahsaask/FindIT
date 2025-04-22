@@ -169,53 +169,54 @@ export default function Home() {
 
             <div className="containerHome mt-10 box bg-white shadow-md overflow-auto">
                 <p className="pb-5 text-lg font-semibold">Recent Items</p>
-
-                <table className="table-auto w-full text-sm">
-                    <thead>
-                        <tr className="bg-gray-50 text-gray-400 text-left">
-                            <th className="px-4 py-3">Item</th>
-                            <th className="px-4 py-3">Location</th>
-                            <th className="px-4 py-3">Status</th>
-                            <th className="px-4 py-3">Date</th>
-                            {currentUserRole==='ownerUser' && (<th className="px-4 py-3">Action</th>)}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {lostitems.map((item, index) => (
-                            <tr className="text-left" key={item.id || index}>
-                                <td className="px-4 py-4 flex items-center gap-4">
-                                    {/* <FaLaptop className='text-xl'/> */}
-                                    <div>
-                                        <p className='font-semibold'>{item?.Description || "N/A"}</p>
-                                        <p className='font-thin text-gray-500'>{item?.Name || "N/A"}</p>
-                                    </div>
-                                </td>
-                                <td className="px-4 py-4">{item?.Location_Name || "Unknown"} - Floor {item?.Floor_number || "N/A"}</td>
-                                <td className="px-4 py-4 text-left">
-                                    {item?.Status === "Found" ? (
-                                        <p className='inline-block px-5 py-1 font-semibold text-green-900 bg-green-100 rounded-full border border-green-100'>Found</p>
-                                    ) : item?.Status === "Claimed" ? (
-                                        <p className='inline-block px-5 py-1 font-semibold text-blue-900 bg-blue-100 rounded-full border border-blue-100'>Claimed</p>
-                                    ) : (
-                                        <p className='inline-block px-5 py-1 font-semibold text-red-900 bg-red-100 rounded-full border border-red-100'>Lost</p>
-                                    )}
-                                </td>
-                                <td className="px-4 py-4">{new Date(item.Date).toLocaleDateString('en-CA', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
-                                {currentUserRole==='ownerUser' && (
-                                    <td
-                                    onClick={() => {
-                                      setSelectedItemId(item.LostItem_ID); // or the correct ID field
-                                      setShowClaimPopup(true);
-                                    }}
-                                    className="px-4 py-4 text-blue-500 cursor-pointer"
-                                  >
-                                    Make Claim
-                                  </td>
-                                    )}
+                <div className="overflow-y-auto max-h-[900px]">
+                    <table className="table-auto w-full text-sm">
+                        <thead>
+                            <tr className="bg-gray-50 text-gray-400 text-left">
+                                <th className="px-4 py-3">Item</th>
+                                <th className="px-4 py-3">Location</th>
+                                <th className="px-4 py-3">Status</th>
+                                <th className="px-4 py-3">Date</th>
+                                {currentUserRole==='ownerUser' && (<th className="px-4 py-3">Action</th>)}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {lostitems.map((item, index) => (
+                                <tr className="text-left" key={item.id || index}>
+                                    <td className="px-4 py-4 flex items-center gap-4">
+                                        {/* <FaLaptop className='text-xl'/> */}
+                                        <div>
+                                            <p className='font-semibold'>{item?.Description || "N/A"}</p>
+                                            <p className='font-thin text-gray-500'>{item?.Name || "N/A"}</p>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4">{item?.Location_Name || "Unknown"} - Floor {item?.Floor_number || "N/A"}</td>
+                                    <td className="px-4 py-4 text-left">
+                                        {item?.Status === "Found" ? (
+                                            <p className='inline-block px-5 py-1 font-semibold text-green-900 bg-green-100 rounded-full border border-green-100'>Found</p>
+                                        ) : item?.Status === "Claimed" ? (
+                                            <p className='inline-block px-5 py-1 font-semibold text-blue-900 bg-blue-100 rounded-full border border-blue-100'>Claimed</p>
+                                        ) : (
+                                            <p className='inline-block px-5 py-1 font-semibold text-red-900 bg-red-100 rounded-full border border-red-100'>Lost</p>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-4">{new Date(item.Date).toLocaleDateString('en-CA', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
+                                    {currentUserRole==='ownerUser' && (
+                                        <td
+                                        onClick={() => {
+                                        setSelectedItemId(item.LostItem_ID); // or the correct ID field
+                                        setShowClaimPopup(true);
+                                        }}
+                                        className="px-4 py-4 text-blue-500 cursor-pointer"
+                                    >
+                                        Make Claim
+                                    </td>
+                                        )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
                 <div>
