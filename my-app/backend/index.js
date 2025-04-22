@@ -585,7 +585,7 @@ app.delete("/delete_item/:id", (req, res) => {
       console.error("Error starting transaction:", err);
       return res.status(500).json({ error: "Database error." });
     }
-    
+
     db.query("UPDATE lost_item SET Claim_ID = NULL WHERE LostItem_ID = ?", [itemId], (err) => {
       if (err) {
         return db.rollback(() => {
@@ -593,7 +593,7 @@ app.delete("/delete_item/:id", (req, res) => {
           res.status(500).json({ error: "Database error." });
         });
       }
-      
+
       db.query("DELETE FROM claim WHERE LostItem_ID = ?", [itemId], (err) => {
         if (err) {
           return db.rollback(() => {
@@ -601,7 +601,7 @@ app.delete("/delete_item/:id", (req, res) => {
             res.status(500).json({ error: "Database error." });
           });
         }
-        
+
         db.query("DELETE FROM creates WHERE LostItem_ID = ?", [itemId], (err) => {
           if (err) {
             return db.rollback(() => {
@@ -609,24 +609,34 @@ app.delete("/delete_item/:id", (req, res) => {
               res.status(500).json({ error: "Database error." });
             });
           }
-          
 
-          db.query("DELETE FROM lost_item WHERE LostItem_ID = ?", [itemId], (err) => {
+          // Delete from specifications
+          db.query("DELETE FROM specifications WHERE LostItem_ID = ?", [itemId], (err) => {
             if (err) {
               return db.rollback(() => {
-                console.error("Error deleting lost item:", err);
+                console.error("Error deleting from specifications:", err);
                 res.status(500).json({ error: "Database error." });
               });
             }
-            
-            db.commit((err) => {
+
+            // Finally, delete from lost_item
+            db.query("DELETE FROM lost_item WHERE LostItem_ID = ?", [itemId], (err) => {
               if (err) {
                 return db.rollback(() => {
-                  console.error("Error committing transaction:", err);
+                  console.error("Error deleting lost item:", err);
                   res.status(500).json({ error: "Database error." });
                 });
               }
-              res.json({ success: true, message: "Item deleted successfully" });
+
+              db.commit((err) => {
+                if (err) {
+                  return db.rollback(() => {
+                    console.error("Error committing transaction:", err);
+                    res.status(500).json({ error: "Database error." });
+                  });
+                }
+                res.json({ success: true, message: "Item deleted successfully" });
+              });
             });
           });
         });
@@ -639,30 +649,46 @@ app.delete("/delete_item/:id", (req, res) => {
 // Delete a finder (for admin)
 app.delete("/delete_finder/:id", (req, res) => {
   const finderId = req.params.id;
-  
-  const q = "DELETE FROM finder WHERE Finder_ID_number = ?";
-  
-  db.query(q, [finderId], (err, data) => {
+
+  // First delete notifications related to the finder
+  db.query("DELETE FROM notification WHERE Finder_ID_number = ?", [finderId], (err) => {
     if (err) {
-      console.error("Error deleting finder:", err);
+      console.error("Error deleting notifications:", err);
       return res.status(500).json({ error: "Database error." });
     }
-    return res.json({ success: true, message: "Finder deleted successfully" });
+
+    // Then delete the finder
+    const q = "DELETE FROM finder WHERE Finder_ID_number = ?";
+    db.query(q, [finderId], (err, data) => {
+      if (err) {
+        console.error("Error deleting finder:", err);
+        return res.status(500).json({ error: "Database error." });
+      }
+      return res.json({ success: true, message: "Finder deleted successfully" });
+    });
   });
 });
 
 // Delete an owner (for admin)
 app.delete("/delete_owner/:id", (req, res) => {
   const ownerId = req.params.id;
-  
-  const q = "DELETE FROM owner WHERE Owner_ID_number = ?";
-  
-  db.query(q, [ownerId], (err, data) => {
+
+  // First delete notifications related to the owner
+  db.query("DELETE FROM notification WHERE Owner_ID_number = ?", [ownerId], (err) => {
     if (err) {
-      console.error("Error deleting owner:", err);
+      console.error("Error deleting notifications:", err);
       return res.status(500).json({ error: "Database error." });
     }
-    return res.json({ success: true, message: "Owner deleted successfully" });
+
+    // Then delete the owner
+    const q = "DELETE FROM owner WHERE Owner_ID_number = ?";
+    db.query(q, [ownerId], (err, data) => {
+      if (err) {
+        console.error("Error deleting owner:", err);
+        return res.status(500).json({ error: "Database error." });
+      }
+      return res.json({ success: true, message: "Owner deleted successfully" });
+    });
   });
 });
 
