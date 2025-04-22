@@ -17,6 +17,7 @@ import { BsFileEarmarkPostFill } from "react-icons/bs";
 
 export default function Home() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [showError, setError] = useState(false)
     const [userid, setUserID] = useState("");
     const router = useRouter();
 
@@ -30,6 +31,9 @@ export default function Home() {
     const [showClaimPopup, setShowClaimPopup] = useState(false);
     const [claimText, setClaimText] = useState('');
     const [selectedItemId, setSelectedItemId] = useState(null); // to track which item is being claimed
+
+    const [notificationsList, setNotificationsList] = useState([]);
+
 
     useEffect(() => {
           const storedID = localStorage.getItem('userId');
@@ -86,15 +90,24 @@ export default function Home() {
 
     const handleSubmitClaim = async (e) => {
         e.preventDefault();
-        console.log("Submit claim for item ID:", selectedItemId, "OwnerID:", userid, "Text:", claimText, "Status:", "Pending");
+        // console.log("Submit claim for item ID:", selectedItemId, "OwnerID:", userid, "Text:", claimText, "Status:", "Pending");
 
         try {
-            await axios.post("http://localhost:8800/add_newclaim", {
+            const response1 = await axios.post("http://localhost:8800/add_newclaim", {
                 Owner_ID_number: userid,
                 LostItem_ID: selectedItemId,
                 Status: "Pending",
                 Text: claimText
             });
+
+            const claimid = response1.data.insertId
+
+            await axios.put("http://localhost:8800/update_item_byclaim", {
+                Claim_ID: claimid,
+                LostItem_ID: selectedItemId
+            });
+
+            console.log("all sent success")
                                     
             setShowClaimPopup(false);
             setClaimText('');
@@ -104,6 +117,28 @@ export default function Home() {
             setError(true)
           }
     }
+
+    const fetchNotifications = async () => {
+        try {
+            const response = await axios.post("http://localhost:8800/get_notifications", {
+                Finder_ID_number: userid,
+                Owner_ID_number: userid,
+            });
+    
+            console.log("Notifications fetched: ", response.data);
+    
+            setNotificationsList(response.data || []);
+        } catch (err) {
+            console.log(err);
+            setError(true);
+        }
+    };
+
+    useEffect(() => {
+        if (userid) {
+            fetchNotifications();
+        }
+    }, [userid]);
 
     return (
         <div className="my-24">
@@ -185,18 +220,30 @@ export default function Home() {
 
                 <div>
                 <div className='containerHome mt-10 grid grid-cols-2 gap-6 px-56'>
-                    <div className="box p-4 bg-white rounded-lg shadow-md">
-                        <p className="text-lg font-semibold">Recent Notifications</p>
-                        <hr className='border-1 my-5'></hr>
-                        <div className='flex items-center gap-4'>
-                            <FaRegBell className='text-xl text-blue-500'/>
-                            <div>
-                                <p className='font-semibold text-sm py-1'>New claim request</p>
-                                <p className='font-thin text-gray-500 text-sm py-1'>John Does submitted a claim for MacBook Pro</p>
-                                <p className='font-thin text-gray-500 text-xs py-1 inline-block'>2 hours ago</p>
+                <div className="box p-4 bg-white rounded-lg shadow-md">
+                    <p className="text-lg font-semibold">Recent Notifications</p>
+                    <hr className='border-1 my-5'></hr>
+
+                    {notificationsList.length === 0 ? (
+                        <p className='text-gray-500 text-sm'>No new notifications.</p>
+                        ) : (notificationsList.map((notif, index) => (
+                            <div key={index} className='flex items-start gap-4 mb-4'>
+                                <FaRegBell className='text-xl text-blue-500 mt-1' />
+                                <div>
+                                    <p className='font-semibold text-sm py-1'>New claim request</p>
+                                    <p className='font-thin text-gray-500 text-sm py-1'>{notif.Text}</p>
+                                    <p className='font-thin text-gray-500 text-xs py-1 inline-block'>
+                                        {new Date(notif.Date).toLocaleString('en-CA', {
+                                            hour: '2-digit', minute: '2-digit', hour12: true,
+                                            day: 'numeric', month: 'short', year: 'numeric'
+                                        })}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        ))
+                    )}
+                </div>
+
 
                     <div className="box p-4 bg-white rounded-lg shadow-md">
                         <p className="text-lg font-semibold">Quick Actions</p>

@@ -287,7 +287,7 @@ app.post("/add_newclaim", (req, res) => {
       console.error("Database error:", err);
       return res.status(500).json({ error: "Failed to insert new claim" });
     }
-    return res.json({ success: true, data });
+    return res.json(data);
   });
 });
 
@@ -549,6 +549,25 @@ app.put("/update_item/:id", (req, res) => {
   const q = "UPDATE lost_item SET Name = ?, Description = ?, Status = ? WHERE LostItem_ID = ?";
   
   db.query(q, [Name, Description, Status, itemId], (err, data) => {
+    if (err) {
+      console.error("Error updating item:", err);
+      return res.status(500).json({ error: "Database error." });
+    }
+    return res.json({ success: true, message: "Item updated successfully" });
+  });
+});
+
+// Update an item (for admin)
+app.put("/update_item_byclaim", (req, res) => {
+  
+  const q = "UPDATE lost_item SET Claim_ID = ? WHERE LostItem_ID = ?";
+
+  const values =[
+    req.body.Claim_ID,    
+    req.body.LostItem_ID,    
+  ]
+  
+  db.query(q, values, (err, data) => {
     if (err) {
       console.error("Error updating item:", err);
       return res.status(500).json({ error: "Database error." });
@@ -982,6 +1001,30 @@ app.post('/add_lost_item_specifications', (req, res) => {
       console.error("Database error:", err);
       return res.status(500).json({ error: "Failed to create post date"});
     }
+    return res.json(data);
+  });
+});
+
+app.post("/get_notifications", (req, res) => {
+  const q = `SELECT Date, Seen_Status, Text FROM finditdb.notification 
+            JOIN finditdb.message ON message.Notify_ID=notification.Notify_ID
+            WHERE notification.Finder_ID_number = ?
+            UNION
+            SELECT Date, Seen_Status, Text FROM finditdb.notification 
+            JOIN finditdb.message ON message.Notify_ID=notification.Notify_ID
+            WHERE notification.Owner_ID_number = ?`;
+
+  const values = [
+    req.body.Finder_ID_number, // Password as a varchar
+    req.body.Owner_ID_number, // Email as a varchar
+  ];
+
+  db.query(q, values, (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ error: "Database error." });
+    }
+
     return res.json(data);
   });
 });

@@ -123,6 +123,7 @@ export default function ReportForm() {
             !selectedCategory ||
             !selectedSize ||
             !selectedCondition ||
+            !selectedColor ||
             !itemName.trim() ||
             !description.trim() ||
             !selectedBuilding ||
