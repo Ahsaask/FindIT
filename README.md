@@ -23,3 +23,5 @@ Getting Started with FindIt:
             - npm run dev
             
         4. Open your browser and navigate to http://localhost:3000
+
+Note: To test out the database you would need to create a new database connection and use the my-app/backend/471FindItDb.sql file. You can replace the db with your own local credentials inside index.js
