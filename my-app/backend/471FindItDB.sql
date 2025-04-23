@@ -438,7 +438,7 @@ CREATE TABLE post (
 
 LOCK TABLES post WRITE;
 /*!40000 ALTER TABLE post DISABLE KEYS */;
-INSERT INTO post VALUES ('Lost AirPods in Student Center',803,'I lost my AirPods Pro in the student center yesterday. Please help!',3,NULL),('Lost iPhone in Library',801,'I lost my iPhone 13 in the library on Feb 15th. It has a black case with my ID inside.',1,NULL),('Missing Blue Backpack',802,'Has anyone found a blue Jansport backpack in the cafeteria? It has my psychology textbooks.',2,NULL);
+INSERT INTO post VALUES ('Lost AirPods in Student Center',803,'I lost my AirPods Pro in the student center yesterday. Please help!',3,101),('Lost iPhone in Library',801,'I lost my iPhone 13 in the library on Feb 15th. It has a black case with my ID inside.',1,102),('Missing Blue Backpack',802,'Has anyone found a blue Jansport backpack in the cafeteria? It has my psychology textbooks.',2,103);
 /*!40000 ALTER TABLE post ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -608,4 +608,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-22 17:36:13
+-- Dump completed on 2025-04-22 18:25:56
